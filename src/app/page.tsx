@@ -891,22 +891,19 @@ export default function EPKPage() {
 
             {/* CC wordmark — absolutely centered */}
             <div style={{ position: "absolute", left: 0, right: 0, top: 0, bottom: 0, display: "flex", alignItems: "center", justifyContent: "center", pointerEvents: "none" }}>
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
-                src="/cc-wordmark.png"
-                alt="Changing Currents"
-                style={{ height: 36, display: "block", mixBlendMode: "multiply" }}
-              />
+              <span style={{ fontFamily: "'NeueHaas', 'Helvetica Neue', Arial, sans-serif", fontSize: 10, letterSpacing: 3, textTransform: "uppercase", color: INK, whiteSpace: "nowrap" }}>
+                Changing Currents
+              </span>
             </div>
 
             {/* CC emblem — right */}
-            <div style={{ marginLeft: "auto", display: "flex", alignItems: "center", paddingRight: 16 }}>
+            <div style={{ marginLeft: "auto", display: "flex", alignItems: "center", paddingRight: 14 }}>
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
                 src="/epk-logo.png"
                 alt=""
                 style={{
-                  height: 34,
+                  height: 40,
                   display: "block",
                   mixBlendMode: "multiply",
                 }}
@@ -960,38 +957,39 @@ export default function EPKPage() {
 
         {/* HERO */}
         {isMobile ? (
-          /* Mobile hero: image top (flex:1), text block at bottom — all fits in one viewport */
+          /* Mobile hero: fixed-height image + compact text — everything visible on first load */
           <section id="hero" style={{ height: `calc(100vh - ${NAV_H}px)`, backgroundColor: BG, display: "flex", flexDirection: "column", overflow: "hidden" }}>
-            {/* Top: hero image — flex:1 so it fills remaining space */}
-            <div style={{ flex: 1, overflow: "hidden", minHeight: 0 }}>
+            {/* Image: exactly enough space, text block gets the rest */}
+            <div style={{ height: "calc(100vh - 52px - 168px)", overflow: "hidden", flexShrink: 0 }}>
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img src="/epk-hero.png" alt="Changing Currents" style={{ width: "100%", height: "100%", objectFit: "cover", objectPosition: "top center", display: "block" }} />
             </div>
-            {/* Bottom: logo + name + tagline — compact so everything fits */}
-            <div style={{ flexShrink: 0, display: "flex", flexDirection: "column", alignItems: "center", padding: "10px 24px 10px" }}>
+            {/* Bottom text block: exactly 168px */}
+            <div style={{ height: 168, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: "0 24px", gap: 0 }}>
               {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src="/epk-logo.png" alt="CC Logo" style={{ width: "clamp(44px, 11vw, 60px)", marginBottom: 6, display: "block", mixBlendMode: "multiply" }} />
-              <h1 style={{ fontFamily: "'Bootzy', serif", fontSize: "clamp(38px, 11vw, 58px)", lineHeight: 0.92, color: INK, margin: 0, letterSpacing: "-1px", textAlign: "center" }}>
+              <img src="/epk-logo.png" alt="CC Logo" style={{ height: 38, display: "block", mixBlendMode: "multiply", marginBottom: 6 }} />
+              <h1 style={{ fontFamily: "'Bootzy', serif", fontSize: "clamp(34px, 10vw, 52px)", lineHeight: 0.92, color: INK, margin: 0, letterSpacing: "-1px", textAlign: "center" }}>
                 CHANGING<br />CURRENTS
               </h1>
-              <p style={{ fontSize: 8, letterSpacing: 5, color: MUTED, textTransform: "uppercase", marginTop: 10, marginBottom: 0, textAlign: "center" }}>
+              <p style={{ fontSize: 8, letterSpacing: 5, color: MUTED, textTransform: "uppercase", marginTop: 8, marginBottom: 0, textAlign: "center" }}>
                 DJ &nbsp;/&nbsp; Producer
               </p>
-              <p style={{
-                fontFamily: "'Homemade Apple', cursive",
-                fontSize: "clamp(10px, 2.8vw, 14px)",
-                color: "rgba(0,0,0,0.45)",
-                margin: "8px 0 0 0",
-                lineHeight: 1,
-                transform: "rotate(-3deg)",
-                display: "inline-block",
-                transformOrigin: "center center",
-              }}>
-                cc baby!
-              </p>
-              <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 2, marginTop: 8 }}>
-                <span style={{ fontSize: 7, letterSpacing: 4, color: "rgba(0,0,0,0.35)", textTransform: "uppercase" }}>Scroll</span>
-                <ChevronDown size={9} color="rgba(0,0,0,0.35)" />
+              <div style={{ display: "flex", alignItems: "center", gap: 10, marginTop: 8 }}>
+                <p style={{
+                  fontFamily: "'Homemade Apple', cursive",
+                  fontSize: "clamp(10px, 2.6vw, 13px)",
+                  color: "rgba(0,0,0,0.4)",
+                  margin: 0,
+                  lineHeight: 1,
+                  transform: "rotate(-3deg)",
+                  display: "inline-block",
+                }}>
+                  cc baby!
+                </p>
+                <div style={{ display: "flex", alignItems: "center", gap: 3, opacity: 0.35 }}>
+                  <span style={{ fontSize: 7, letterSpacing: 3, color: INK, textTransform: "uppercase" }}>Scroll</span>
+                  <ChevronDown size={8} color={INK} />
+                </div>
               </div>
             </div>
           </section>
