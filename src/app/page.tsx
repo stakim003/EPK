@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { ArrowLeft, ChevronDown, Play, Menu, X } from "lucide-react";
+import { ChevronDown, Play, Menu, X } from "lucide-react";
 import gsap from "gsap";
 
 const BG    = "#F5F3EE";
@@ -143,9 +143,17 @@ function useIsMobile() {
 // ── Stats section component ───────────────────────────────
 type StatPlatform = "instagram" | "tiktok" | "soundcloud" | "youtube";
 
+const PREVIEW = 4;
+
 function StatsSection() {
   const [platform, setPlatform] = useState<StatPlatform>("instagram");
+  const [showAll, setShowAll] = useState(false);
   const isMobile = useIsMobile();
+
+  // Reset showAll when platform changes
+  useEffect(() => {
+    setShowAll(false);
+  }, [platform]);
 
   const platformTabs: { id: StatPlatform; label: string }[] = [
     { id: "instagram",  label: "Instagram" },
@@ -164,6 +172,51 @@ function StatsSection() {
     { label: "Shares",   val: p.shares },
     { label: "Comments", val: p.comments },
   ];
+
+  // Shared "See All" / fade overlay wrapper
+  const WithShowMore = ({
+    totalCount,
+    children,
+  }: {
+    totalCount: number;
+    children: React.ReactNode;
+  }) => (
+    <div style={{ position: "relative" }}>
+      {children}
+      {!showAll && totalCount > PREVIEW && (
+        <div style={{
+          position: "absolute",
+          bottom: 0,
+          left: 0,
+          right: 0,
+          height: 140,
+          background: `linear-gradient(to bottom, transparent, ${BG})`,
+          zIndex: 1,
+          display: "flex",
+          alignItems: "flex-end",
+          justifyContent: "center",
+          paddingBottom: 16,
+        }}>
+          <button
+            onClick={() => setShowAll(true)}
+            style={{
+              zIndex: 2,
+              fontSize: 10,
+              letterSpacing: 3,
+              textTransform: "uppercase",
+              color: INK,
+              background: "none",
+              border: "none",
+              cursor: "pointer",
+              fontFamily: "inherit",
+            }}
+          >
+            See all {totalCount} →
+          </button>
+        </div>
+      )}
+    </div>
+  );
 
   return (
     <section id="stats" style={{ minHeight: `calc(100vh - ${NAV_H}px)`, backgroundColor: BG, borderTop: `1px solid ${RULE}`, display: "flex", flexDirection: "column" }}>
@@ -234,191 +287,199 @@ function StatsSection() {
       {/* Instagram list */}
       {platform === "instagram" && (
         <div style={{ overflowY: "auto", flex: 1 }}>
-          {INSTA_TOP.map((post, i) => (
-            <a key={i} href={post.url} target="_blank" rel="noopener noreferrer"
-              style={{
-                textDecoration: "none",
-                display: "flex",
-                alignItems: isMobile ? "flex-start" : "center",
-                padding: isMobile ? "0 24px" : "0 80px",
-                borderBottom: `1px solid ${RULE}`,
-                cursor: "pointer",
-                gap: 0,
-              }}
-              onMouseEnter={e => (e.currentTarget.style.backgroundColor = "rgba(0,0,0,0.025)")}
-              onMouseLeave={e => (e.currentTarget.style.backgroundColor = "transparent")}
-            >
-              {/* Index — hide on mobile */}
-              {!isMobile && (
-                <span style={{ width: 36, fontSize: 11, color: FAINT, flexShrink: 0, paddingTop: 2 }}>{String(i + 1).padStart(2, "0")}</span>
-              )}
-              {/* Views — hero number */}
-              <div style={{ width: isMobile ? "auto" : 180, padding: "18px 0", flexShrink: 0, minWidth: isMobile ? 0 : 180 }}>
-                <div style={{ fontFamily: "'Bootzy', serif", fontSize: "clamp(32px, 9vw, 52px)", color: INK, lineHeight: 1 }}>{post.views}</div>
-                <div style={{ fontSize: 10, letterSpacing: 2, color: INK, textTransform: "uppercase", marginTop: 6 }}>Views</div>
-                {isMobile && (
-                  /* Secondary stats below views number on mobile */
-                  <div style={{ display: "flex", gap: 16, marginTop: 8, flexWrap: "wrap" }}>
+          <WithShowMore totalCount={INSTA_TOP.length}>
+            {(showAll ? INSTA_TOP : INSTA_TOP.slice(0, PREVIEW)).map((post, i) => (
+              <a key={i} href={post.url} target="_blank" rel="noopener noreferrer"
+                style={{
+                  textDecoration: "none",
+                  display: "flex",
+                  alignItems: isMobile ? "flex-start" : "center",
+                  padding: isMobile ? "0 24px" : "0 80px",
+                  borderBottom: `1px solid ${RULE}`,
+                  cursor: "pointer",
+                  gap: 0,
+                }}
+                onMouseEnter={e => (e.currentTarget.style.backgroundColor = "rgba(0,0,0,0.025)")}
+                onMouseLeave={e => (e.currentTarget.style.backgroundColor = "transparent")}
+              >
+                {/* Index — hide on mobile */}
+                {!isMobile && (
+                  <span style={{ width: 36, fontSize: 11, color: FAINT, flexShrink: 0, paddingTop: 2 }}>{String(i + 1).padStart(2, "0")}</span>
+                )}
+                {/* Views — hero number */}
+                <div style={{ width: isMobile ? "auto" : 180, padding: "18px 0", flexShrink: 0, minWidth: isMobile ? 0 : 180 }}>
+                  <div style={{ fontFamily: "'Bootzy', serif", fontSize: "clamp(32px, 9vw, 52px)", color: INK, lineHeight: 1 }}>{post.views}</div>
+                  <div style={{ fontSize: 10, letterSpacing: 2, color: INK, textTransform: "uppercase", marginTop: 6 }}>Views</div>
+                  {isMobile && (
+                    /* Secondary stats below views number on mobile */
+                    <div style={{ display: "flex", gap: 16, marginTop: 8, flexWrap: "wrap" }}>
+                      {instaSecondary(post).map(s => (
+                        <div key={s.label}>
+                          <span style={{ fontFamily: "'Bootzy', serif", fontSize: 13, color: INK, lineHeight: 1 }}>{s.val}</span>
+                          <span style={{ fontSize: 8, letterSpacing: 1.5, color: MUTED, textTransform: "uppercase", marginLeft: 4 }}>{s.label}</span>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+                {/* Caption — hide on mobile */}
+                {!isMobile && (
+                  <span style={{ flex: 1, fontSize: 12, color: MUTED, letterSpacing: 0.2, paddingRight: 24 }}>{post.caption}</span>
+                )}
+                {/* Secondary stats — desktop only inline */}
+                {!isMobile && (
+                  <div style={{ display: "flex", gap: 32, flexShrink: 0 }}>
                     {instaSecondary(post).map(s => (
-                      <div key={s.label}>
-                        <span style={{ fontFamily: "'Bootzy', serif", fontSize: 13, color: INK, lineHeight: 1 }}>{s.val}</span>
-                        <span style={{ fontSize: 8, letterSpacing: 1.5, color: MUTED, textTransform: "uppercase", marginLeft: 4 }}>{s.label}</span>
+                      <div key={s.label} style={{ textAlign: "right" }}>
+                        <div style={{ fontFamily: "'Bootzy', serif", fontSize: 18, color: INK, lineHeight: 1 }}>{s.val}</div>
+                        <div style={{ fontSize: 10, letterSpacing: 2, color: INK, textTransform: "uppercase", marginTop: 5 }}>{s.label}</div>
                       </div>
                     ))}
                   </div>
                 )}
-              </div>
-              {/* Caption — hide on mobile */}
-              {!isMobile && (
-                <span style={{ flex: 1, fontSize: 12, color: MUTED, letterSpacing: 0.2, paddingRight: 24 }}>{post.caption}</span>
-              )}
-              {/* Secondary stats — desktop only inline */}
-              {!isMobile && (
-                <div style={{ display: "flex", gap: 32, flexShrink: 0 }}>
-                  {instaSecondary(post).map(s => (
-                    <div key={s.label} style={{ textAlign: "right" }}>
-                      <div style={{ fontFamily: "'Bootzy', serif", fontSize: 18, color: INK, lineHeight: 1 }}>{s.val}</div>
-                      <div style={{ fontSize: 10, letterSpacing: 2, color: INK, textTransform: "uppercase", marginTop: 5 }}>{s.label}</div>
-                    </div>
-                  ))}
-                </div>
-              )}
-              <span style={{ width: 32, fontSize: 13, color: FAINT, textAlign: "right", flexShrink: 0, alignSelf: "center" }}>↗</span>
-            </a>
-          ))}
+                <span style={{ width: 32, fontSize: 13, color: FAINT, textAlign: "right", flexShrink: 0, alignSelf: "center" }}>↗</span>
+              </a>
+            ))}
+          </WithShowMore>
         </div>
       )}
 
       {/* TikTok list */}
       {platform === "tiktok" && (
         <div style={{ overflowY: "auto", flex: 1 }}>
-          {TIKTOK_TOP.map((post, i) => (
-            <a key={i} href={post.url} target="_blank" rel="noopener noreferrer"
-              style={{
-                textDecoration: "none",
-                display: "flex",
-                alignItems: isMobile ? "flex-start" : "center",
-                padding: isMobile ? "0 24px" : "0 80px",
-                borderBottom: `1px solid ${RULE}`,
-                cursor: "pointer",
-                gap: 0,
-              }}
-              onMouseEnter={e => (e.currentTarget.style.backgroundColor = "rgba(0,0,0,0.025)")}
-              onMouseLeave={e => (e.currentTarget.style.backgroundColor = "transparent")}
-            >
-              {!isMobile && (
-                <span style={{ width: 36, fontSize: 11, color: FAINT, flexShrink: 0, paddingTop: 2 }}>{String(i + 1).padStart(2, "0")}</span>
-              )}
-              <div style={{ width: isMobile ? "auto" : 180, padding: "18px 0", flexShrink: 0 }}>
-                <div style={{ fontFamily: "'Bootzy', serif", fontSize: "clamp(32px, 9vw, 52px)", color: INK, lineHeight: 1 }}>{post.views}</div>
-                <div style={{ fontSize: 10, letterSpacing: 2, color: INK, textTransform: "uppercase", marginTop: 6 }}>Views</div>
-                {isMobile && (
-                  <div style={{ display: "flex", gap: 16, marginTop: 8, flexWrap: "wrap" }}>
+          <WithShowMore totalCount={TIKTOK_TOP.length}>
+            {(showAll ? TIKTOK_TOP : TIKTOK_TOP.slice(0, PREVIEW)).map((post, i) => (
+              <a key={i} href={post.url} target="_blank" rel="noopener noreferrer"
+                style={{
+                  textDecoration: "none",
+                  display: "flex",
+                  alignItems: isMobile ? "flex-start" : "center",
+                  padding: isMobile ? "0 24px" : "0 80px",
+                  borderBottom: `1px solid ${RULE}`,
+                  cursor: "pointer",
+                  gap: 0,
+                }}
+                onMouseEnter={e => (e.currentTarget.style.backgroundColor = "rgba(0,0,0,0.025)")}
+                onMouseLeave={e => (e.currentTarget.style.backgroundColor = "transparent")}
+              >
+                {!isMobile && (
+                  <span style={{ width: 36, fontSize: 11, color: FAINT, flexShrink: 0, paddingTop: 2 }}>{String(i + 1).padStart(2, "0")}</span>
+                )}
+                <div style={{ width: isMobile ? "auto" : 180, padding: "18px 0", flexShrink: 0 }}>
+                  <div style={{ fontFamily: "'Bootzy', serif", fontSize: "clamp(32px, 9vw, 52px)", color: INK, lineHeight: 1 }}>{post.views}</div>
+                  <div style={{ fontSize: 10, letterSpacing: 2, color: INK, textTransform: "uppercase", marginTop: 6 }}>Views</div>
+                  {isMobile && (
+                    <div style={{ display: "flex", gap: 16, marginTop: 8, flexWrap: "wrap" }}>
+                      {tiktokSecondary(post).map(s => (
+                        <div key={s.label}>
+                          <span style={{ fontFamily: "'Bootzy', serif", fontSize: 13, color: INK, lineHeight: 1 }}>{s.val}</span>
+                          <span style={{ fontSize: 8, letterSpacing: 1.5, color: MUTED, textTransform: "uppercase", marginLeft: 4 }}>{s.label}</span>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+                {!isMobile && <div style={{ flex: 1 }} />}
+                {!isMobile && (
+                  <div style={{ display: "flex", gap: 32, flexShrink: 0 }}>
                     {tiktokSecondary(post).map(s => (
-                      <div key={s.label}>
-                        <span style={{ fontFamily: "'Bootzy', serif", fontSize: 13, color: INK, lineHeight: 1 }}>{s.val}</span>
-                        <span style={{ fontSize: 8, letterSpacing: 1.5, color: MUTED, textTransform: "uppercase", marginLeft: 4 }}>{s.label}</span>
+                      <div key={s.label} style={{ textAlign: "right" }}>
+                        <div style={{ fontFamily: "'Bootzy', serif", fontSize: 18, color: INK, lineHeight: 1 }}>{s.val}</div>
+                        <div style={{ fontSize: 10, letterSpacing: 2, color: INK, textTransform: "uppercase", marginTop: 5 }}>{s.label}</div>
                       </div>
                     ))}
                   </div>
                 )}
-              </div>
-              {!isMobile && <div style={{ flex: 1 }} />}
-              {!isMobile && (
-                <div style={{ display: "flex", gap: 32, flexShrink: 0 }}>
-                  {tiktokSecondary(post).map(s => (
-                    <div key={s.label} style={{ textAlign: "right" }}>
-                      <div style={{ fontFamily: "'Bootzy', serif", fontSize: 18, color: INK, lineHeight: 1 }}>{s.val}</div>
-                      <div style={{ fontSize: 10, letterSpacing: 2, color: INK, textTransform: "uppercase", marginTop: 5 }}>{s.label}</div>
-                    </div>
-                  ))}
-                </div>
-              )}
-              <span style={{ width: 32, fontSize: 13, color: FAINT, textAlign: "right", flexShrink: 0, alignSelf: "center" }}>↗</span>
-            </a>
-          ))}
+                <span style={{ width: 32, fontSize: 13, color: FAINT, textAlign: "right", flexShrink: 0, alignSelf: "center" }}>↗</span>
+              </a>
+            ))}
+          </WithShowMore>
         </div>
       )}
 
       {/* SoundCloud list */}
       {platform === "soundcloud" && (
         <div style={{ overflowY: "auto", flex: 1 }}>
-          {SOUNDCLOUD_TOP.map((track, i) => (
-            <a key={i} href={track.url} target="_blank" rel="noopener noreferrer"
-              style={{
-                textDecoration: "none",
-                display: "flex",
-                alignItems: isMobile ? "flex-start" : "center",
-                padding: isMobile ? "0 24px" : "0 80px",
-                borderBottom: `1px solid ${RULE}`,
-                cursor: "pointer",
-                gap: 0,
-              }}
-              onMouseEnter={e => (e.currentTarget.style.backgroundColor = "rgba(0,0,0,0.025)")}
-              onMouseLeave={e => (e.currentTarget.style.backgroundColor = "transparent")}
-            >
-              {!isMobile && (
-                <span style={{ width: 36, fontSize: 11, color: FAINT, flexShrink: 0 }}>{String(i + 1).padStart(2, "0")}</span>
-              )}
-              <span style={{ width: isMobile ? "auto" : 160, fontFamily: "'Bootzy', serif", fontSize: "clamp(32px, 9vw, 52px)", color: INK, lineHeight: 1, padding: "18px 0", flexShrink: 0 }}>
-                {track.plays}
-              </span>
-              {!isMobile && (
-                <span style={{ flex: 1, fontFamily: "'Bootzy', serif", fontSize: 22, color: INK, letterSpacing: 1 }}>{track.title}</span>
-              )}
-              {!isMobile && (
-                <span style={{ fontSize: 10, letterSpacing: 3, color: INK, textTransform: "uppercase" }}>Plays</span>
-              )}
-              <span style={{ width: 32, fontSize: 13, color: FAINT, textAlign: "right", flexShrink: 0, alignSelf: "center" }}>↗</span>
-            </a>
-          ))}
+          <WithShowMore totalCount={SOUNDCLOUD_TOP.length}>
+            {(showAll ? SOUNDCLOUD_TOP : SOUNDCLOUD_TOP.slice(0, PREVIEW)).map((track, i) => (
+              <a key={i} href={track.url} target="_blank" rel="noopener noreferrer"
+                style={{
+                  textDecoration: "none",
+                  display: "flex",
+                  alignItems: isMobile ? "flex-start" : "center",
+                  padding: isMobile ? "0 24px" : "0 80px",
+                  borderBottom: `1px solid ${RULE}`,
+                  cursor: "pointer",
+                  gap: 0,
+                }}
+                onMouseEnter={e => (e.currentTarget.style.backgroundColor = "rgba(0,0,0,0.025)")}
+                onMouseLeave={e => (e.currentTarget.style.backgroundColor = "transparent")}
+              >
+                {!isMobile && (
+                  <span style={{ width: 36, fontSize: 11, color: FAINT, flexShrink: 0 }}>{String(i + 1).padStart(2, "0")}</span>
+                )}
+                <span style={{ width: isMobile ? "auto" : 160, fontFamily: "'Bootzy', serif", fontSize: "clamp(32px, 9vw, 52px)", color: INK, lineHeight: 1, padding: "18px 0", flexShrink: 0 }}>
+                  {track.plays}
+                </span>
+                {!isMobile && (
+                  <span style={{ flex: 1, fontFamily: "'Bootzy', serif", fontSize: 22, color: INK, letterSpacing: 1 }}>{track.title}</span>
+                )}
+                {!isMobile && (
+                  <span style={{ fontSize: 10, letterSpacing: 3, color: INK, textTransform: "uppercase" }}>Plays</span>
+                )}
+                <span style={{ width: 32, fontSize: 13, color: FAINT, textAlign: "right", flexShrink: 0, alignSelf: "center" }}>↗</span>
+              </a>
+            ))}
+          </WithShowMore>
         </div>
       )}
 
       {/* YouTube list */}
       {platform === "youtube" && (
         <div style={{ overflowY: "auto", flex: 1 }}>
-          {YOUTUBE_TOP.map((vid, i) => (
-            <a key={i} href={vid.url} target="_blank" rel="noopener noreferrer"
-              style={{
-                textDecoration: "none",
-                display: "flex",
-                alignItems: isMobile ? "flex-start" : "center",
-                padding: isMobile ? "0 24px" : "0 80px",
-                borderBottom: `1px solid ${RULE}`,
-                cursor: "pointer",
-                gap: 0,
-              }}
-              onMouseEnter={e => (e.currentTarget.style.backgroundColor = "rgba(0,0,0,0.025)")}
-              onMouseLeave={e => (e.currentTarget.style.backgroundColor = "transparent")}
-            >
-              {!isMobile && (
-                <span style={{ width: 36, fontSize: 11, color: FAINT, flexShrink: 0 }}>{String(i + 1).padStart(2, "0")}</span>
-              )}
-              <div style={{ width: isMobile ? "auto" : 180, padding: "18px 0", flexShrink: 0 }}>
-                <div style={{ fontFamily: "'Bootzy', serif", fontSize: "clamp(32px, 9vw, 52px)", color: INK, lineHeight: 1 }}>{vid.views}</div>
-                <div style={{ fontSize: 10, letterSpacing: 2, color: INK, textTransform: "uppercase", marginTop: 5 }}>Views</div>
-                {isMobile && (
-                  <div style={{ display: "flex", gap: 16, marginTop: 8 }}>
-                    <div>
-                      <span style={{ fontFamily: "'Bootzy', serif", fontSize: 13, color: INK }}>{vid.likes}</span>
-                      <span style={{ fontSize: 8, letterSpacing: 1.5, color: MUTED, textTransform: "uppercase", marginLeft: 4 }}>Likes</span>
+          <WithShowMore totalCount={YOUTUBE_TOP.length}>
+            {(showAll ? YOUTUBE_TOP : YOUTUBE_TOP.slice(0, PREVIEW)).map((vid, i) => (
+              <a key={i} href={vid.url} target="_blank" rel="noopener noreferrer"
+                style={{
+                  textDecoration: "none",
+                  display: "flex",
+                  alignItems: isMobile ? "flex-start" : "center",
+                  padding: isMobile ? "0 24px" : "0 80px",
+                  borderBottom: `1px solid ${RULE}`,
+                  cursor: "pointer",
+                  gap: 0,
+                }}
+                onMouseEnter={e => (e.currentTarget.style.backgroundColor = "rgba(0,0,0,0.025)")}
+                onMouseLeave={e => (e.currentTarget.style.backgroundColor = "transparent")}
+              >
+                {!isMobile && (
+                  <span style={{ width: 36, fontSize: 11, color: FAINT, flexShrink: 0 }}>{String(i + 1).padStart(2, "0")}</span>
+                )}
+                <div style={{ width: isMobile ? "auto" : 180, padding: "18px 0", flexShrink: 0 }}>
+                  <div style={{ fontFamily: "'Bootzy', serif", fontSize: "clamp(32px, 9vw, 52px)", color: INK, lineHeight: 1 }}>{vid.views}</div>
+                  <div style={{ fontSize: 10, letterSpacing: 2, color: INK, textTransform: "uppercase", marginTop: 5 }}>Views</div>
+                  {isMobile && (
+                    <div style={{ display: "flex", gap: 16, marginTop: 8 }}>
+                      <div>
+                        <span style={{ fontFamily: "'Bootzy', serif", fontSize: 13, color: INK }}>{vid.likes}</span>
+                        <span style={{ fontSize: 8, letterSpacing: 1.5, color: MUTED, textTransform: "uppercase", marginLeft: 4 }}>Likes</span>
+                      </div>
                     </div>
+                  )}
+                </div>
+                {!isMobile && (
+                  <span style={{ flex: 1, fontSize: 12, color: MUTED, letterSpacing: 0.2, paddingRight: 24 }}>{vid.title}</span>
+                )}
+                {!isMobile && (
+                  <div style={{ textAlign: "right", flexShrink: 0 }}>
+                    <div style={{ fontFamily: "'Bootzy', serif", fontSize: 18, color: INK, lineHeight: 1 }}>{vid.likes}</div>
+                    <div style={{ fontSize: 10, letterSpacing: 2, color: INK, textTransform: "uppercase", marginTop: 5 }}>Likes</div>
                   </div>
                 )}
-              </div>
-              {!isMobile && (
-                <span style={{ flex: 1, fontSize: 12, color: MUTED, letterSpacing: 0.2, paddingRight: 24 }}>{vid.title}</span>
-              )}
-              {!isMobile && (
-                <div style={{ textAlign: "right", flexShrink: 0 }}>
-                  <div style={{ fontFamily: "'Bootzy', serif", fontSize: 18, color: INK, lineHeight: 1 }}>{vid.likes}</div>
-                  <div style={{ fontSize: 10, letterSpacing: 2, color: INK, textTransform: "uppercase", marginTop: 5 }}>Likes</div>
-                </div>
-              )}
-              <span style={{ width: 32, fontSize: 13, color: FAINT, textAlign: "right", flexShrink: 0, alignSelf: "center" }}>↗</span>
-            </a>
-          ))}
+                <span style={{ width: 32, fontSize: 13, color: FAINT, textAlign: "right", flexShrink: 0, alignSelf: "center" }}>↗</span>
+              </a>
+            ))}
+          </WithShowMore>
         </div>
       )}
 
@@ -806,20 +867,57 @@ export default function EPKPage() {
       <nav style={{
         position: "fixed", top: 0, left: 0, right: 0, zIndex: 100,
         backgroundColor: BG, borderBottom: `1px solid ${RULE}`,
-        display: "flex", alignItems: "center", padding: `0 ${isMobile ? 20 : 36}px`, height: NAV_H,
+        display: "flex", alignItems: "center",
+        padding: isMobile ? "0" : `0 36px`,
+        height: NAV_H,
       }}>
-        <a href="https://changingcurrents.co.uk" style={{
-          display: "flex", alignItems: "center", gap: 7,
-          fontSize: 9, letterSpacing: 2.5, textTransform: "uppercase",
-          color: MUTED, textDecoration: "none", marginRight: isMobile ? "auto" : 40, flexShrink: 0,
-        }}>
-          <ArrowLeft size={11} /> {isMobile ? "" : "Back"}
-        </a>
 
-        {/* Desktop nav links */}
-        {!isMobile && (
+        {isMobile ? (
+          /* ── Mobile nav: hamburger | CC wordmark (centered) | palm ── */
           <>
-            <div style={{ width: 1, height: 16, backgroundColor: RULE, marginRight: 40, flexShrink: 0 }} />
+            {/* Hamburger — left */}
+            <button
+              onClick={() => setMenuOpen(true)}
+              style={{
+                background: "none", border: "none", cursor: "pointer",
+                width: 44, height: NAV_H,
+                display: "flex", alignItems: "center", justifyContent: "center",
+                flexShrink: 0,
+              }}
+              aria-label="Open menu"
+            >
+              <Menu size={22} color={INK} />
+            </button>
+
+            {/* CC wordmark — absolutely centered */}
+            <div style={{ position: "absolute", left: 0, right: 0, top: 0, bottom: 0, display: "flex", alignItems: "center", justifyContent: "center", pointerEvents: "none" }}>
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src="/cc-wordmark.png"
+                alt="Changing Currents"
+                style={{ height: 18, display: "block", mixBlendMode: "multiply" }}
+              />
+            </div>
+
+            {/* Palm tree — right */}
+            <div style={{ marginLeft: "auto", display: "flex", alignItems: "center", paddingRight: 16 }}>
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src="/palm.png"
+                alt=""
+                style={{
+                  height: 26,
+                  display: "block",
+                  filter: "invert(1)",
+                  mixBlendMode: "multiply",
+                  opacity: 0.55,
+                }}
+              />
+            </div>
+          </>
+        ) : (
+          /* ── Desktop nav: tab buttons + optional palm ── */
+          <>
             <div style={{ display: "flex", overflowX: "auto" }}>
               {TABS.map((tab) => (
                 <button key={tab.id} onClick={() => goTo(tab.id)} style={{
@@ -837,18 +935,22 @@ export default function EPKPage() {
                 </button>
               ))}
             </div>
+            {/* Palm tree decoration — far right */}
+            <div style={{ marginLeft: "auto", display: "flex", alignItems: "center" }}>
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src="/palm.png"
+                alt=""
+                style={{
+                  height: 22,
+                  display: "block",
+                  filter: "invert(1)",
+                  mixBlendMode: "multiply",
+                  opacity: 0.55,
+                }}
+              />
+            </div>
           </>
-        )}
-
-        {/* Mobile hamburger button */}
-        {isMobile && (
-          <button
-            onClick={() => setMenuOpen(true)}
-            style={{ background: "none", border: "none", cursor: "pointer", padding: 8, display: "flex", alignItems: "center", justifyContent: "center" }}
-            aria-label="Open menu"
-          >
-            <Menu size={22} color={INK} />
-          </button>
         )}
       </nav>
 
@@ -862,28 +964,28 @@ export default function EPKPage() {
 
         {/* HERO */}
         {isMobile ? (
-          /* Mobile hero: image top 55%, logo+name+tagline at bottom */
+          /* Mobile hero: image top (flex:1), text block at bottom */
           <section id="hero" style={{ height: `calc(100vh - ${NAV_H}px)`, backgroundColor: BG, display: "flex", flexDirection: "column", overflow: "hidden", position: "relative" }}>
-            {/* Top: hero image fills ~55% */}
-            <div style={{ height: "55%", overflow: "hidden", flexShrink: 0, position: "relative" }}>
+            {/* Top: hero image — flex:1 so it takes remaining space */}
+            <div style={{ flex: 1, overflow: "hidden", position: "relative" }}>
               {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src="/epk-hero.png" alt="Changing Currents" style={{ width: "100%", height: "100%", objectFit: "cover", objectPosition: "center top", display: "block" }} />
+              <img src="/epk-hero.png" alt="Changing Currents" style={{ width: "100%", height: "100%", objectFit: "cover", objectPosition: "top center", display: "block" }} />
             </div>
-            {/* Bottom: logo + name + tagline centered */}
-            <div style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: "24px 24px 48px" }}>
+            {/* Bottom: logo + name + tagline */}
+            <div style={{ flexShrink: 0, display: "flex", flexDirection: "column", alignItems: "center", padding: "20px 24px 32px" }}>
               {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src="/epk-logo.png" alt="CC Logo" style={{ width: 72, marginBottom: 14, display: "block", mixBlendMode: "multiply" }} />
-              <h1 style={{ fontFamily: "'Bootzy', serif", fontSize: "clamp(44px, 13vw, 72px)", lineHeight: 0.93, color: INK, margin: 0, letterSpacing: "-1px", textAlign: "center" }}>
+              <img src="/epk-logo.png" alt="CC Logo" style={{ width: "clamp(70px, 18vw, 110px)", marginBottom: 12, display: "block", mixBlendMode: "multiply" }} />
+              <h1 style={{ fontFamily: "'Bootzy', serif", fontSize: "clamp(42px, 12vw, 64px)", lineHeight: 0.93, color: INK, margin: 0, letterSpacing: "-1px", textAlign: "center" }}>
                 CHANGING<br />CURRENTS
               </h1>
-              <p style={{ fontSize: 9, letterSpacing: 5, color: MUTED, textTransform: "uppercase", marginTop: 16, marginBottom: 0, textAlign: "center" }}>
+              <p style={{ fontSize: 9, letterSpacing: 5, color: MUTED, textTransform: "uppercase", marginTop: 14, marginBottom: 0, textAlign: "center" }}>
                 DJ &nbsp;/&nbsp; Producer
               </p>
               <p style={{
                 fontFamily: "'Homemade Apple', cursive",
-                fontSize: 13,
+                fontSize: "clamp(11px, 3vw, 16px)",
                 color: "rgba(0,0,0,0.45)",
-                margin: "14px 0 0 0",
+                margin: "12px 0 0 0",
                 lineHeight: 1,
                 transform: "rotate(-3deg)",
                 display: "inline-block",
@@ -959,8 +1061,12 @@ export default function EPKPage() {
 
         {/* CAMPAIGN */}
         <section id="campaigns" style={{ ...snap, borderTop: `1px solid ${RULE}`, display: "flex", flexDirection: "column" }}>
-          <div style={{ padding: isMobile ? "40px 24px 28px" : "52px 80px 36px", borderBottom: `1px solid ${RULE}`, flexShrink: 0 }}>
+          <div style={{ padding: isMobile ? "24px 24px 24px" : "52px 80px 36px", borderBottom: `1px solid ${RULE}`, flexShrink: 0 }}>
             <span style={{ fontFamily: "'Bootzy', serif", fontSize: 36, letterSpacing: 3, color: INK, textTransform: "uppercase" }}>Campaign</span>
+            <div style={{ marginTop: 12, display: "flex", alignItems: "center", gap: 10 }}>
+              <span style={{ fontSize: 9, letterSpacing: 4, color: MUTED, textTransform: "uppercase" }}>Scroll</span>
+              <span style={{ fontSize: 14, color: MUTED }}>→</span>
+            </div>
           </div>
           <CampaignLayout />
         </section>
