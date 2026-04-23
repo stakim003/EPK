@@ -182,20 +182,23 @@ function StatsSection() {
     children: React.ReactNode;
   }) => (
     <div style={{ position: "relative" }}>
-      {children}
+      {/* Extra bottom padding so last item isn't hidden behind the fade */}
+      <div style={{ paddingBottom: !showAll && totalCount > PREVIEW ? 56 : 0 }}>
+        {children}
+      </div>
       {!showAll && totalCount > PREVIEW && (
         <div style={{
           position: "absolute",
           bottom: 0,
           left: 0,
           right: 0,
-          height: 140,
+          height: 100,
           background: `linear-gradient(to bottom, transparent, ${BG})`,
           zIndex: 1,
           display: "flex",
           alignItems: "flex-end",
           justifyContent: "center",
-          paddingBottom: 16,
+          paddingBottom: 12,
         }}>
           <button
             onClick={() => setShowAll(true)}
