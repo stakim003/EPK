@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { ArrowLeft, ChevronDown, Play } from "lucide-react";
+import { ArrowLeft, ChevronDown, Play, Menu, X } from "lucide-react";
 import gsap from "gsap";
 
 const BG    = "#F5F3EE";
@@ -100,182 +100,7 @@ const BRAND_VIDEOS = [
   { src: "",                   brand: "Brand Name", year: "2024", label: "Campaign Shoot" },
 ];
 
-// ── Stats section component ───────────────────────────────
-type StatPlatform = "instagram" | "tiktok" | "soundcloud" | "youtube";
-
-function StatsSection() {
-  const [platform, setPlatform] = useState<StatPlatform>("instagram");
-
-  const platformTabs: { id: StatPlatform; label: string }[] = [
-    { id: "instagram",  label: "Instagram" },
-    { id: "tiktok",     label: "TikTok" },
-    { id: "soundcloud", label: "SoundCloud" },
-    { id: "youtube",    label: "YouTube" },
-  ];
-
-  const instaSecondary = (p: typeof INSTA_TOP[0]) => [
-    { label: "Likes",    val: p.likes },
-    { label: "Saves",    val: p.saves },
-    { label: "Comments", val: p.comments },
-  ];
-  const tiktokSecondary = (p: typeof TIKTOK_TOP[0]) => [
-    { label: "Likes",    val: p.likes },
-    { label: "Shares",   val: p.shares },
-    { label: "Comments", val: p.comments },
-  ];
-
-  return (
-    <section id="stats" style={{ minHeight: `calc(100vh - ${NAV_H}px)`, backgroundColor: BG, borderTop: `1px solid ${RULE}`, display: "flex", flexDirection: "column" }}>
-
-      {/* Section title + follower banners */}
-      <div style={{ padding: "52px 80px 0", flexShrink: 0 }}>
-        <span style={{ fontFamily: "'Bootzy', serif", fontSize: 36, letterSpacing: 3, color: INK, textTransform: "uppercase" }}>Stats &amp; Reach</span>
-
-        {/* Big follower numbers */}
-        <div style={{ display: "flex", marginTop: 40, borderTop: `1px solid ${RULE}` }}>
-          {STATS.map((stat, i) => (
-            <div key={stat.label} style={{
-              flex: 1,
-              padding: "28px 0 28px",
-              paddingLeft: i === 0 ? 0 : 52,
-              borderRight: i < STATS.length - 1 ? `1px solid ${RULE}` : "none",
-            }}>
-              <div style={{ fontFamily: "'Bootzy', serif", fontSize: "clamp(52px, 6vw, 88px)", color: INK, lineHeight: 1 }}>{stat.number}</div>
-              <div style={{ fontSize: 10, letterSpacing: 4, color: INK, textTransform: "uppercase", marginTop: 10 }}>{stat.label} Followers</div>
-            </div>
-          ))}
-        </div>
-      </div>
-
-      {/* Platform tabs */}
-      <div style={{ display: "flex", padding: "0 80px", marginTop: 0, borderBottom: `1px solid ${RULE}`, borderTop: `1px solid ${RULE}`, flexShrink: 0 }}>
-        {platformTabs.map((tab) => (
-          <button key={tab.id} onClick={() => setPlatform(tab.id)} style={{
-            background: "none", border: "none", cursor: "pointer",
-            padding: "16px 0", marginRight: 44,
-            fontSize: 9, letterSpacing: 4, textTransform: "uppercase",
-            color: platform === tab.id ? INK : MUTED,
-            borderBottom: platform === tab.id ? `2px solid ${INK}` : "2px solid transparent",
-            marginBottom: -1, fontFamily: "inherit",
-          }}>
-            {tab.label}
-          </button>
-        ))}
-      </div>
-
-      {/* Instagram list */}
-      {platform === "instagram" && (
-        <div style={{ overflowY: "auto", flex: 1 }}>
-          {INSTA_TOP.map((post, i) => (
-            <a key={i} href={post.url} target="_blank" rel="noopener noreferrer"
-              style={{ textDecoration: "none", display: "flex", alignItems: "center", padding: "0 80px", borderBottom: `1px solid ${RULE}`, cursor: "pointer", gap: 0 }}
-              onMouseEnter={e => (e.currentTarget.style.backgroundColor = "rgba(0,0,0,0.025)")}
-              onMouseLeave={e => (e.currentTarget.style.backgroundColor = "transparent")}
-            >
-              {/* Index */}
-              <span style={{ width: 36, fontSize: 11, color: FAINT, flexShrink: 0, paddingTop: 2 }}>{String(i + 1).padStart(2, "0")}</span>
-              {/* Views — hero number */}
-              <div style={{ width: 180, padding: "22px 0", flexShrink: 0 }}>
-                <div style={{ fontFamily: "'Bootzy', serif", fontSize: "clamp(32px, 3.2vw, 52px)", color: INK, lineHeight: 1 }}>{post.views}</div>
-                <div style={{ fontSize: 10, letterSpacing: 2, color: INK, textTransform: "uppercase", marginTop: 6 }}>Views</div>
-              </div>
-              {/* Caption */}
-              <span style={{ flex: 1, fontSize: 12, color: MUTED, letterSpacing: 0.2, paddingRight: 24 }}>{post.caption}</span>
-              {/* Secondary stats */}
-              <div style={{ display: "flex", gap: 32, flexShrink: 0 }}>
-                {instaSecondary(post).map(s => (
-                  <div key={s.label} style={{ textAlign: "right" }}>
-                    <div style={{ fontFamily: "'Bootzy', serif", fontSize: 18, color: INK, lineHeight: 1 }}>{s.val}</div>
-                    <div style={{ fontSize: 10, letterSpacing: 2, color: INK, textTransform: "uppercase", marginTop: 5 }}>{s.label}</div>
-                  </div>
-                ))}
-              </div>
-              <span style={{ width: 32, fontSize: 13, color: FAINT, textAlign: "right", flexShrink: 0 }}>↗</span>
-            </a>
-          ))}
-        </div>
-      )}
-
-      {/* TikTok list */}
-      {platform === "tiktok" && (
-        <div style={{ overflowY: "auto", flex: 1 }}>
-          {TIKTOK_TOP.map((post, i) => (
-            <a key={i} href={post.url} target="_blank" rel="noopener noreferrer"
-              style={{ textDecoration: "none", display: "flex", alignItems: "center", padding: "0 80px", borderBottom: `1px solid ${RULE}`, cursor: "pointer", gap: 0 }}
-              onMouseEnter={e => (e.currentTarget.style.backgroundColor = "rgba(0,0,0,0.025)")}
-              onMouseLeave={e => (e.currentTarget.style.backgroundColor = "transparent")}
-            >
-              <span style={{ width: 36, fontSize: 11, color: FAINT, flexShrink: 0, paddingTop: 2 }}>{String(i + 1).padStart(2, "0")}</span>
-              <div style={{ width: 180, padding: "22px 0", flexShrink: 0 }}>
-                <div style={{ fontFamily: "'Bootzy', serif", fontSize: "clamp(32px, 3.2vw, 52px)", color: INK, lineHeight: 1 }}>{post.views}</div>
-                <div style={{ fontSize: 10, letterSpacing: 2, color: INK, textTransform: "uppercase", marginTop: 6 }}>Views</div>
-              </div>
-              <div style={{ flex: 1 }} />
-              <div style={{ display: "flex", gap: 32, flexShrink: 0 }}>
-                {tiktokSecondary(post).map(s => (
-                  <div key={s.label} style={{ textAlign: "right" }}>
-                    <div style={{ fontFamily: "'Bootzy', serif", fontSize: 18, color: INK, lineHeight: 1 }}>{s.val}</div>
-                    <div style={{ fontSize: 10, letterSpacing: 2, color: INK, textTransform: "uppercase", marginTop: 5 }}>{s.label}</div>
-                  </div>
-                ))}
-              </div>
-              <span style={{ width: 32, fontSize: 13, color: FAINT, textAlign: "right", flexShrink: 0 }}>↗</span>
-            </a>
-          ))}
-        </div>
-      )}
-
-      {/* SoundCloud list */}
-      {platform === "soundcloud" && (
-        <div style={{ overflowY: "auto", flex: 1 }}>
-          {SOUNDCLOUD_TOP.map((track, i) => (
-            <a key={i} href={track.url} target="_blank" rel="noopener noreferrer"
-              style={{ textDecoration: "none", display: "flex", alignItems: "center", padding: "0 80px", borderBottom: `1px solid ${RULE}`, cursor: "pointer", gap: 0 }}
-              onMouseEnter={e => (e.currentTarget.style.backgroundColor = "rgba(0,0,0,0.025)")}
-              onMouseLeave={e => (e.currentTarget.style.backgroundColor = "transparent")}
-            >
-              <span style={{ width: 36, fontSize: 11, color: FAINT, flexShrink: 0 }}>{String(i + 1).padStart(2, "0")}</span>
-              <span style={{ width: 160, fontFamily: "'Bootzy', serif", fontSize: "clamp(32px, 3.2vw, 52px)", color: INK, lineHeight: 1, padding: "22px 0", flexShrink: 0 }}>
-                {track.plays}
-              </span>
-              <span style={{ flex: 1, fontFamily: "'Bootzy', serif", fontSize: 22, color: INK, letterSpacing: 1 }}>{track.title}</span>
-              <span style={{ fontSize: 10, letterSpacing: 3, color: INK, textTransform: "uppercase" }}>Plays</span>
-              <span style={{ width: 32, fontSize: 13, color: FAINT, textAlign: "right", flexShrink: 0 }}>↗</span>
-            </a>
-          ))}
-        </div>
-      )}
-
-      {/* YouTube list */}
-      {platform === "youtube" && (
-        <div style={{ overflowY: "auto", flex: 1 }}>
-          {YOUTUBE_TOP.map((vid, i) => (
-            <a key={i} href={vid.url} target="_blank" rel="noopener noreferrer"
-              style={{ textDecoration: "none", display: "flex", alignItems: "center", padding: "0 80px", borderBottom: `1px solid ${RULE}`, cursor: "pointer", gap: 0 }}
-              onMouseEnter={e => (e.currentTarget.style.backgroundColor = "rgba(0,0,0,0.025)")}
-              onMouseLeave={e => (e.currentTarget.style.backgroundColor = "transparent")}
-            >
-              <span style={{ width: 36, fontSize: 11, color: FAINT, flexShrink: 0 }}>{String(i + 1).padStart(2, "0")}</span>
-              <div style={{ width: 180, padding: "22px 0", flexShrink: 0 }}>
-                <div style={{ fontFamily: "'Bootzy', serif", fontSize: "clamp(32px, 3.2vw, 52px)", color: INK, lineHeight: 1 }}>{vid.views}</div>
-                <div style={{ fontSize: 10, letterSpacing: 2, color: INK, textTransform: "uppercase", marginTop: 5 }}>Views</div>
-              </div>
-              <span style={{ flex: 1, fontSize: 12, color: MUTED, letterSpacing: 0.2, paddingRight: 24 }}>{vid.title}</span>
-              <div style={{ textAlign: "right", flexShrink: 0 }}>
-                <div style={{ fontFamily: "'Bootzy', serif", fontSize: 18, color: INK, lineHeight: 1 }}>{vid.likes}</div>
-                <div style={{ fontSize: 10, letterSpacing: 2, color: INK, textTransform: "uppercase", marginTop: 5 }}>Likes</div>
-              </div>
-              <span style={{ width: 32, fontSize: 13, color: FAINT, textAlign: "right", flexShrink: 0 }}>↗</span>
-            </a>
-          ))}
-        </div>
-      )}
-
-    </section>
-  );
-}
-
-// ── Video grid component ──────────────────────────────────
+// ── Shoot photos / layout ─────────────────────────────────
 const SHOOT_PHOTOS = [
   "/shoots/DSC03692.jpg",
   "/shoots/DSC09311.jpeg",
@@ -302,6 +127,306 @@ const SHOOT_LAYOUT: ("full" | "pair")[] = [
   "full", "pair", "full", "full", "pair", "full", "pair", "full",
 ];
 
+// ── useIsMobile hook ─────────────────────────────────────
+function useIsMobile() {
+  const [isMobile, setIsMobile] = useState(false);
+  useEffect(() => {
+    const mq = window.matchMedia("(max-width: 767px)");
+    const handler = (e: MediaQueryListEvent) => setIsMobile(e.matches);
+    setIsMobile(mq.matches);
+    mq.addEventListener("change", handler);
+    return () => mq.removeEventListener("change", handler);
+  }, []);
+  return isMobile;
+}
+
+// ── Stats section component ───────────────────────────────
+type StatPlatform = "instagram" | "tiktok" | "soundcloud" | "youtube";
+
+function StatsSection() {
+  const [platform, setPlatform] = useState<StatPlatform>("instagram");
+  const isMobile = useIsMobile();
+
+  const platformTabs: { id: StatPlatform; label: string }[] = [
+    { id: "instagram",  label: "Instagram" },
+    { id: "tiktok",     label: "TikTok" },
+    { id: "soundcloud", label: "SoundCloud" },
+    { id: "youtube",    label: "YouTube" },
+  ];
+
+  const instaSecondary = (p: typeof INSTA_TOP[0]) => [
+    { label: "Likes",    val: p.likes },
+    { label: "Saves",    val: p.saves },
+    { label: "Comments", val: p.comments },
+  ];
+  const tiktokSecondary = (p: typeof TIKTOK_TOP[0]) => [
+    { label: "Likes",    val: p.likes },
+    { label: "Shares",   val: p.shares },
+    { label: "Comments", val: p.comments },
+  ];
+
+  return (
+    <section id="stats" style={{ minHeight: `calc(100vh - ${NAV_H}px)`, backgroundColor: BG, borderTop: `1px solid ${RULE}`, display: "flex", flexDirection: "column" }}>
+
+      {/* Section title + follower banners */}
+      <div style={{ padding: isMobile ? "40px 24px 0" : "52px 80px 0", flexShrink: 0 }}>
+        <span style={{ fontFamily: "'Bootzy', serif", fontSize: 36, letterSpacing: 3, color: INK, textTransform: "uppercase" }}>Stats &amp; Reach</span>
+
+        {/* Big follower numbers */}
+        {isMobile ? (
+          /* Mobile: 3-across grid with clamp sizes */
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", marginTop: 40, borderTop: `1px solid ${RULE}` }}>
+            {STATS.map((stat, i) => (
+              <div key={stat.label} className="stat-item" style={{
+                padding: "20px 0",
+                paddingLeft: i === 0 ? 0 : 12,
+                borderRight: i < STATS.length - 1 ? `1px solid ${RULE}` : "none",
+              }}>
+                <div style={{ fontFamily: "'Bootzy', serif", fontSize: "clamp(32px, 9vw, 52px)", color: INK, lineHeight: 1 }}>{stat.number}</div>
+                <div style={{ fontSize: 8, letterSpacing: 2, color: INK, textTransform: "uppercase", marginTop: 8 }}>{stat.label}</div>
+              </div>
+            ))}
+          </div>
+        ) : (
+          /* Desktop: flex row */
+          <div style={{ display: "flex", marginTop: 40, borderTop: `1px solid ${RULE}` }}>
+            {STATS.map((stat, i) => (
+              <div key={stat.label} className="stat-item" style={{
+                flex: 1,
+                padding: "28px 0 28px",
+                paddingLeft: i === 0 ? 0 : 52,
+                borderRight: i < STATS.length - 1 ? `1px solid ${RULE}` : "none",
+              }}>
+                <div style={{ fontFamily: "'Bootzy', serif", fontSize: "clamp(52px, 6vw, 88px)", color: INK, lineHeight: 1 }}>{stat.number}</div>
+                <div style={{ fontSize: 10, letterSpacing: 4, color: INK, textTransform: "uppercase", marginTop: 10 }}>{stat.label} Followers</div>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+
+      {/* Platform tabs */}
+      <div style={{
+        display: "flex",
+        padding: isMobile ? "0 24px" : "0 80px",
+        marginTop: 0,
+        borderBottom: `1px solid ${RULE}`,
+        borderTop: `1px solid ${RULE}`,
+        flexShrink: 0,
+        overflowX: isMobile ? "auto" : "visible",
+        scrollbarWidth: "none",
+      }}>
+        {platformTabs.map((tab) => (
+          <button key={tab.id} onClick={() => setPlatform(tab.id)} style={{
+            background: "none", border: "none", cursor: "pointer",
+            padding: "16px 0", marginRight: isMobile ? 28 : 44,
+            fontSize: 9, letterSpacing: 4, textTransform: "uppercase",
+            color: platform === tab.id ? INK : MUTED,
+            borderBottom: platform === tab.id ? `2px solid ${INK}` : "2px solid transparent",
+            marginBottom: -1, fontFamily: "inherit",
+            flexShrink: 0,
+          }}>
+            {tab.label}
+          </button>
+        ))}
+      </div>
+
+      {/* Instagram list */}
+      {platform === "instagram" && (
+        <div style={{ overflowY: "auto", flex: 1 }}>
+          {INSTA_TOP.map((post, i) => (
+            <a key={i} href={post.url} target="_blank" rel="noopener noreferrer"
+              style={{
+                textDecoration: "none",
+                display: "flex",
+                alignItems: isMobile ? "flex-start" : "center",
+                padding: isMobile ? "0 24px" : "0 80px",
+                borderBottom: `1px solid ${RULE}`,
+                cursor: "pointer",
+                gap: 0,
+              }}
+              onMouseEnter={e => (e.currentTarget.style.backgroundColor = "rgba(0,0,0,0.025)")}
+              onMouseLeave={e => (e.currentTarget.style.backgroundColor = "transparent")}
+            >
+              {/* Index — hide on mobile */}
+              {!isMobile && (
+                <span style={{ width: 36, fontSize: 11, color: FAINT, flexShrink: 0, paddingTop: 2 }}>{String(i + 1).padStart(2, "0")}</span>
+              )}
+              {/* Views — hero number */}
+              <div style={{ width: isMobile ? "auto" : 180, padding: "18px 0", flexShrink: 0, minWidth: isMobile ? 0 : 180 }}>
+                <div style={{ fontFamily: "'Bootzy', serif", fontSize: "clamp(32px, 9vw, 52px)", color: INK, lineHeight: 1 }}>{post.views}</div>
+                <div style={{ fontSize: 10, letterSpacing: 2, color: INK, textTransform: "uppercase", marginTop: 6 }}>Views</div>
+                {isMobile && (
+                  /* Secondary stats below views number on mobile */
+                  <div style={{ display: "flex", gap: 16, marginTop: 8, flexWrap: "wrap" }}>
+                    {instaSecondary(post).map(s => (
+                      <div key={s.label}>
+                        <span style={{ fontFamily: "'Bootzy', serif", fontSize: 13, color: INK, lineHeight: 1 }}>{s.val}</span>
+                        <span style={{ fontSize: 8, letterSpacing: 1.5, color: MUTED, textTransform: "uppercase", marginLeft: 4 }}>{s.label}</span>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+              {/* Caption — hide on mobile */}
+              {!isMobile && (
+                <span style={{ flex: 1, fontSize: 12, color: MUTED, letterSpacing: 0.2, paddingRight: 24 }}>{post.caption}</span>
+              )}
+              {/* Secondary stats — desktop only inline */}
+              {!isMobile && (
+                <div style={{ display: "flex", gap: 32, flexShrink: 0 }}>
+                  {instaSecondary(post).map(s => (
+                    <div key={s.label} style={{ textAlign: "right" }}>
+                      <div style={{ fontFamily: "'Bootzy', serif", fontSize: 18, color: INK, lineHeight: 1 }}>{s.val}</div>
+                      <div style={{ fontSize: 10, letterSpacing: 2, color: INK, textTransform: "uppercase", marginTop: 5 }}>{s.label}</div>
+                    </div>
+                  ))}
+                </div>
+              )}
+              <span style={{ width: 32, fontSize: 13, color: FAINT, textAlign: "right", flexShrink: 0, alignSelf: "center" }}>↗</span>
+            </a>
+          ))}
+        </div>
+      )}
+
+      {/* TikTok list */}
+      {platform === "tiktok" && (
+        <div style={{ overflowY: "auto", flex: 1 }}>
+          {TIKTOK_TOP.map((post, i) => (
+            <a key={i} href={post.url} target="_blank" rel="noopener noreferrer"
+              style={{
+                textDecoration: "none",
+                display: "flex",
+                alignItems: isMobile ? "flex-start" : "center",
+                padding: isMobile ? "0 24px" : "0 80px",
+                borderBottom: `1px solid ${RULE}`,
+                cursor: "pointer",
+                gap: 0,
+              }}
+              onMouseEnter={e => (e.currentTarget.style.backgroundColor = "rgba(0,0,0,0.025)")}
+              onMouseLeave={e => (e.currentTarget.style.backgroundColor = "transparent")}
+            >
+              {!isMobile && (
+                <span style={{ width: 36, fontSize: 11, color: FAINT, flexShrink: 0, paddingTop: 2 }}>{String(i + 1).padStart(2, "0")}</span>
+              )}
+              <div style={{ width: isMobile ? "auto" : 180, padding: "18px 0", flexShrink: 0 }}>
+                <div style={{ fontFamily: "'Bootzy', serif", fontSize: "clamp(32px, 9vw, 52px)", color: INK, lineHeight: 1 }}>{post.views}</div>
+                <div style={{ fontSize: 10, letterSpacing: 2, color: INK, textTransform: "uppercase", marginTop: 6 }}>Views</div>
+                {isMobile && (
+                  <div style={{ display: "flex", gap: 16, marginTop: 8, flexWrap: "wrap" }}>
+                    {tiktokSecondary(post).map(s => (
+                      <div key={s.label}>
+                        <span style={{ fontFamily: "'Bootzy', serif", fontSize: 13, color: INK, lineHeight: 1 }}>{s.val}</span>
+                        <span style={{ fontSize: 8, letterSpacing: 1.5, color: MUTED, textTransform: "uppercase", marginLeft: 4 }}>{s.label}</span>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+              {!isMobile && <div style={{ flex: 1 }} />}
+              {!isMobile && (
+                <div style={{ display: "flex", gap: 32, flexShrink: 0 }}>
+                  {tiktokSecondary(post).map(s => (
+                    <div key={s.label} style={{ textAlign: "right" }}>
+                      <div style={{ fontFamily: "'Bootzy', serif", fontSize: 18, color: INK, lineHeight: 1 }}>{s.val}</div>
+                      <div style={{ fontSize: 10, letterSpacing: 2, color: INK, textTransform: "uppercase", marginTop: 5 }}>{s.label}</div>
+                    </div>
+                  ))}
+                </div>
+              )}
+              <span style={{ width: 32, fontSize: 13, color: FAINT, textAlign: "right", flexShrink: 0, alignSelf: "center" }}>↗</span>
+            </a>
+          ))}
+        </div>
+      )}
+
+      {/* SoundCloud list */}
+      {platform === "soundcloud" && (
+        <div style={{ overflowY: "auto", flex: 1 }}>
+          {SOUNDCLOUD_TOP.map((track, i) => (
+            <a key={i} href={track.url} target="_blank" rel="noopener noreferrer"
+              style={{
+                textDecoration: "none",
+                display: "flex",
+                alignItems: isMobile ? "flex-start" : "center",
+                padding: isMobile ? "0 24px" : "0 80px",
+                borderBottom: `1px solid ${RULE}`,
+                cursor: "pointer",
+                gap: 0,
+              }}
+              onMouseEnter={e => (e.currentTarget.style.backgroundColor = "rgba(0,0,0,0.025)")}
+              onMouseLeave={e => (e.currentTarget.style.backgroundColor = "transparent")}
+            >
+              {!isMobile && (
+                <span style={{ width: 36, fontSize: 11, color: FAINT, flexShrink: 0 }}>{String(i + 1).padStart(2, "0")}</span>
+              )}
+              <span style={{ width: isMobile ? "auto" : 160, fontFamily: "'Bootzy', serif", fontSize: "clamp(32px, 9vw, 52px)", color: INK, lineHeight: 1, padding: "18px 0", flexShrink: 0 }}>
+                {track.plays}
+              </span>
+              {!isMobile && (
+                <span style={{ flex: 1, fontFamily: "'Bootzy', serif", fontSize: 22, color: INK, letterSpacing: 1 }}>{track.title}</span>
+              )}
+              {!isMobile && (
+                <span style={{ fontSize: 10, letterSpacing: 3, color: INK, textTransform: "uppercase" }}>Plays</span>
+              )}
+              <span style={{ width: 32, fontSize: 13, color: FAINT, textAlign: "right", flexShrink: 0, alignSelf: "center" }}>↗</span>
+            </a>
+          ))}
+        </div>
+      )}
+
+      {/* YouTube list */}
+      {platform === "youtube" && (
+        <div style={{ overflowY: "auto", flex: 1 }}>
+          {YOUTUBE_TOP.map((vid, i) => (
+            <a key={i} href={vid.url} target="_blank" rel="noopener noreferrer"
+              style={{
+                textDecoration: "none",
+                display: "flex",
+                alignItems: isMobile ? "flex-start" : "center",
+                padding: isMobile ? "0 24px" : "0 80px",
+                borderBottom: `1px solid ${RULE}`,
+                cursor: "pointer",
+                gap: 0,
+              }}
+              onMouseEnter={e => (e.currentTarget.style.backgroundColor = "rgba(0,0,0,0.025)")}
+              onMouseLeave={e => (e.currentTarget.style.backgroundColor = "transparent")}
+            >
+              {!isMobile && (
+                <span style={{ width: 36, fontSize: 11, color: FAINT, flexShrink: 0 }}>{String(i + 1).padStart(2, "0")}</span>
+              )}
+              <div style={{ width: isMobile ? "auto" : 180, padding: "18px 0", flexShrink: 0 }}>
+                <div style={{ fontFamily: "'Bootzy', serif", fontSize: "clamp(32px, 9vw, 52px)", color: INK, lineHeight: 1 }}>{vid.views}</div>
+                <div style={{ fontSize: 10, letterSpacing: 2, color: INK, textTransform: "uppercase", marginTop: 5 }}>Views</div>
+                {isMobile && (
+                  <div style={{ display: "flex", gap: 16, marginTop: 8 }}>
+                    <div>
+                      <span style={{ fontFamily: "'Bootzy', serif", fontSize: 13, color: INK }}>{vid.likes}</span>
+                      <span style={{ fontSize: 8, letterSpacing: 1.5, color: MUTED, textTransform: "uppercase", marginLeft: 4 }}>Likes</span>
+                    </div>
+                  </div>
+                )}
+              </div>
+              {!isMobile && (
+                <span style={{ flex: 1, fontSize: 12, color: MUTED, letterSpacing: 0.2, paddingRight: 24 }}>{vid.title}</span>
+              )}
+              {!isMobile && (
+                <div style={{ textAlign: "right", flexShrink: 0 }}>
+                  <div style={{ fontFamily: "'Bootzy', serif", fontSize: 18, color: INK, lineHeight: 1 }}>{vid.likes}</div>
+                  <div style={{ fontSize: 10, letterSpacing: 2, color: INK, textTransform: "uppercase", marginTop: 5 }}>Likes</div>
+                </div>
+              )}
+              <span style={{ width: 32, fontSize: 13, color: FAINT, textAlign: "right", flexShrink: 0, alignSelf: "center" }}>↗</span>
+            </a>
+          ))}
+        </div>
+      )}
+
+    </section>
+  );
+}
+
+// ── CampaignLayout ────────────────────────────────────────
 function CampaignLayout() {
   const [playing, setPlaying] = useState(false);
   const [scrollPct, setScrollPct] = useState(0);
@@ -309,12 +434,13 @@ function CampaignLayout() {
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const scrollContainerRef = useRef<HTMLDivElement | null>(null);
   const dragStart = useRef<{ x: number; left: number } | null>(null);
+  const isMobile = useIsMobile();
   const vid = BRAND_VIDEOS[0];
 
-  const FRAME_H = `calc((100vh - ${NAV_H}px) * 0.84)`;
-  const VIDEO_W = `calc((100vh - ${NAV_H}px) * 0.84 * 9 / 16)`;
-  const FULL_W  = "clamp(200px, 18vw, 280px)";
-  const PAIR_W  = "clamp(220px, 20vw, 310px)";
+  const FRAME_H = isMobile ? "72vh" : `calc((100vh - ${NAV_H}px) * 0.84)`;
+  const VIDEO_W = isMobile ? `calc(72vh * 9 / 16)` : `calc((100vh - ${NAV_H}px) * 0.84 * 9 / 16)`;
+  const FULL_W  = isMobile ? "72vw" : "clamp(200px, 18vw, 280px)";
+  const PAIR_W  = isMobile ? "78vw" : "clamp(220px, 20vw, 310px)";
 
   let photoIndex = 0;
   const slots = SHOOT_LAYOUT.map((type) => {
@@ -362,10 +488,20 @@ function CampaignLayout() {
           onMouseMove={onMouseMove}
           onMouseUp={onMouseUp}
           onMouseLeave={onMouseUp}
-          style={{ display: "flex", flexDirection: "row", alignItems: "flex-start", gap: 3, padding: "0 0 40px 40px", overflowX: "auto", height: "100%",
-            scrollbarWidth: "none", msOverflowStyle: "none" as React.CSSProperties["msOverflowStyle"],
-            cursor: dragging ? "grabbing" : "grab",
-            userSelect: "none" }}>
+          style={{
+            display: "flex",
+            flexDirection: "row",
+            alignItems: "flex-start",
+            gap: 3,
+            padding: "0 0 40px 40px",
+            overflowX: "auto",
+            height: "100%",
+            scrollbarWidth: "none",
+            msOverflowStyle: "none" as React.CSSProperties["msOverflowStyle"],
+            cursor: isMobile ? "default" : (dragging ? "grabbing" : "grab"),
+            userSelect: "none",
+            WebkitOverflowScrolling: "touch",
+          }}>
 
           {/* Video */}
           <div style={{ position: "relative", width: VIDEO_W, height: FRAME_H, flexShrink: 0, backgroundColor: "#0a0a0a", cursor: dragging ? "grabbing" : "pointer", overflow: "hidden" }}
@@ -424,6 +560,7 @@ function CampaignLayout() {
   );
 }
 
+// ── VideoGrid ─────────────────────────────────────────────
 function VideoGrid() {
   const [playing, setPlaying] = useState<number | null>(null);
   const videoRefs = useRef<(HTMLVideoElement | null)[]>([]);
@@ -510,16 +647,75 @@ function VideoGrid() {
   );
 }
 
+// ── Hamburger Menu Overlay ────────────────────────────────
+function MobileMenuOverlay({ open, onClose, onNav }: { open: boolean; onClose: () => void; onNav: (id: string) => void }) {
+  if (!open) return null;
+  return (
+    <div style={{
+      position: "fixed",
+      inset: 0,
+      zIndex: 200,
+      backgroundColor: BG,
+      display: "flex",
+      flexDirection: "column",
+      padding: "0 24px",
+    }}>
+      {/* Close button */}
+      <div style={{ height: NAV_H, display: "flex", alignItems: "center", justifyContent: "flex-end" }}>
+        <button
+          onClick={onClose}
+          style={{ background: "none", border: "none", cursor: "pointer", padding: 8, display: "flex", alignItems: "center", justifyContent: "center" }}
+          aria-label="Close menu"
+        >
+          <X size={22} color={INK} />
+        </button>
+      </div>
+      {/* Nav links */}
+      <nav style={{ flex: 1, display: "flex", flexDirection: "column", justifyContent: "center", gap: 8 }}>
+        {TABS.map((tab) => (
+          <button
+            key={tab.id}
+            onClick={() => onNav(tab.id)}
+            style={{
+              background: "none",
+              border: "none",
+              cursor: "pointer",
+              textAlign: "left",
+              padding: "12px 0",
+              fontFamily: "'Bootzy', serif",
+              fontSize: 48,
+              color: INK,
+              letterSpacing: 1,
+              lineHeight: 1.1,
+              borderBottom: `1px solid ${RULE}`,
+            }}
+          >
+            {tab.label}
+          </button>
+        ))}
+      </nav>
+    </div>
+  );
+}
+
 // ─────────────────────────────────────────────────────────
 
 export default function EPKPage() {
   const [activeTab, setActiveTab] = useState("bio");
+  const [menuOpen, setMenuOpen] = useState(false);
   const scrollRef  = useRef<HTMLDivElement>(null);
   const bioTextRef = useRef<HTMLParagraphElement>(null);
+  const isMobile = useIsMobile();
 
   const goTo = (id: string) => {
     const el = document.getElementById(id);
     if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
+  };
+
+  const handleNavClick = (id: string) => {
+    setMenuOpen(false);
+    // Small delay to let overlay close before scrolling
+    setTimeout(() => goTo(id), 80);
   };
 
   useEffect(() => {
@@ -603,37 +799,57 @@ export default function EPKPage() {
   return (
     <main style={{ backgroundColor: BG, color: INK, fontFamily: "'NeueHaas', 'Helvetica Neue', sans-serif" }}>
 
+      {/* ── Mobile hamburger overlay ─────────────────── */}
+      <MobileMenuOverlay open={menuOpen} onClose={() => setMenuOpen(false)} onNav={handleNavClick} />
+
       {/* ── NAV ─────────────────────────────────────── */}
       <nav style={{
         position: "fixed", top: 0, left: 0, right: 0, zIndex: 100,
         backgroundColor: BG, borderBottom: `1px solid ${RULE}`,
-        display: "flex", alignItems: "center", padding: `0 36px`, height: NAV_H,
+        display: "flex", alignItems: "center", padding: `0 ${isMobile ? 20 : 36}px`, height: NAV_H,
       }}>
         <a href="https://changingcurrents.co.uk" style={{
           display: "flex", alignItems: "center", gap: 7,
           fontSize: 9, letterSpacing: 2.5, textTransform: "uppercase",
-          color: MUTED, textDecoration: "none", marginRight: 40, flexShrink: 0,
+          color: MUTED, textDecoration: "none", marginRight: isMobile ? "auto" : 40, flexShrink: 0,
         }}>
-          <ArrowLeft size={11} /> Back
+          <ArrowLeft size={11} /> {isMobile ? "" : "Back"}
         </a>
-        <div style={{ width: 1, height: 16, backgroundColor: RULE, marginRight: 40, flexShrink: 0 }} />
-        <div style={{ display: "flex", overflowX: "auto" }}>
-          {TABS.map((tab) => (
-            <button key={tab.id} onClick={() => goTo(tab.id)} style={{
-              background: "none", border: "none", cursor: "pointer",
-              padding: "0 22px", height: NAV_H,
-              fontSize: 11, letterSpacing: 1.5, textTransform: "uppercase",
-              color: activeTab === tab.id ? INK : "rgba(0,0,0,0.65)",
-              fontFamily: "'NeueHaas', 'Helvetica Neue', sans-serif",
-              position: "relative", transition: "color 0.2s", flexShrink: 0,
-            }}>
-              {tab.label}
-              {activeTab === tab.id && (
-                <span style={{ position: "absolute", bottom: 0, left: 20, right: 20, height: 1, backgroundColor: INK }} />
-              )}
-            </button>
-          ))}
-        </div>
+
+        {/* Desktop nav links */}
+        {!isMobile && (
+          <>
+            <div style={{ width: 1, height: 16, backgroundColor: RULE, marginRight: 40, flexShrink: 0 }} />
+            <div style={{ display: "flex", overflowX: "auto" }}>
+              {TABS.map((tab) => (
+                <button key={tab.id} onClick={() => goTo(tab.id)} style={{
+                  background: "none", border: "none", cursor: "pointer",
+                  padding: "0 22px", height: NAV_H,
+                  fontSize: 11, letterSpacing: 1.5, textTransform: "uppercase",
+                  color: activeTab === tab.id ? INK : "rgba(0,0,0,0.65)",
+                  fontFamily: "'NeueHaas', 'Helvetica Neue', sans-serif",
+                  position: "relative", transition: "color 0.2s", flexShrink: 0,
+                }}>
+                  {tab.label}
+                  {activeTab === tab.id && (
+                    <span style={{ position: "absolute", bottom: 0, left: 20, right: 20, height: 1, backgroundColor: INK }} />
+                  )}
+                </button>
+              ))}
+            </div>
+          </>
+        )}
+
+        {/* Mobile hamburger button */}
+        {isMobile && (
+          <button
+            onClick={() => setMenuOpen(true)}
+            style={{ background: "none", border: "none", cursor: "pointer", padding: 8, display: "flex", alignItems: "center", justifyContent: "center" }}
+            aria-label="Open menu"
+          >
+            <Menu size={22} color={INK} />
+          </button>
+        )}
       </nav>
 
       {/* ── SCROLL CONTAINER ────────────────────────── */}
@@ -645,44 +861,95 @@ export default function EPKPage() {
       }}>
 
         {/* HERO */}
-        <section id="hero" style={{ height: `calc(100vh - ${NAV_H}px)`, backgroundColor: BG, display: "flex", flexDirection: "row", overflow: "hidden", position: "relative" }}>
-          <div style={{ width: "44%", display: "flex", flexDirection: "column", justifyContent: "flex-end", alignItems: "center", padding: "0 0 72px 32px", flexShrink: 0, zIndex: 2 }}>
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src="/epk-logo.png" alt="CC Logo" style={{ width: "clamp(110px, 13vw, 165px)", marginBottom: 20, display: "block", mixBlendMode: "multiply" }} />
-            <h1 style={{ fontFamily: "'Bootzy', serif", fontSize: "clamp(56px, 7vw, 108px)", lineHeight: 0.93, color: INK, margin: 0, letterSpacing: "-1px", textAlign: "center" }}>
-              CHANGING<br />CURRENTS
-            </h1>
-            <p style={{ fontSize: 10, letterSpacing: 5, color: MUTED, textTransform: "uppercase", marginTop: 22, marginBottom: 0, textAlign: "center" }}>
-              DJ &nbsp;/&nbsp; Producer
-            </p>
-            <p style={{
-              fontFamily: "'Homemade Apple', cursive",
-              fontSize: "clamp(12px, 1.3vw, 18px)",
-              color: "rgba(0,0,0,0.45)",
-              margin: "20px 0 0 0",
-              lineHeight: 1,
-              transform: "rotate(-3deg)",
-              display: "inline-block",
-              transformOrigin: "center center",
-            }}>
-              cc baby!
-            </p>
-          </div>
-          <div style={{ flex: 1, display: "flex", alignItems: "flex-end", justifyContent: "center", position: "relative" }}>
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src="/epk-hero.png" alt="Changing Currents" style={{ height: "100%", width: "100%", objectFit: "contain", objectPosition: "center bottom" }} />
-
-          </div>
-          <div style={{ position: "absolute", bottom: 24, left: "50%", transform: "translateX(-50%)", display: "flex", flexDirection: "column", alignItems: "center", gap: 5, zIndex: 3 }}>
-            <span style={{ fontSize: 10, letterSpacing: 4, color: INK, textTransform: "uppercase" }}>Scroll</span>
-            <ChevronDown size={12} color={INK} />
-          </div>
-        </section>
+        {isMobile ? (
+          /* Mobile hero: image top 55%, logo+name+tagline at bottom */
+          <section id="hero" style={{ height: `calc(100vh - ${NAV_H}px)`, backgroundColor: BG, display: "flex", flexDirection: "column", overflow: "hidden", position: "relative" }}>
+            {/* Top: hero image fills ~55% */}
+            <div style={{ height: "55%", overflow: "hidden", flexShrink: 0, position: "relative" }}>
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src="/epk-hero.png" alt="Changing Currents" style={{ width: "100%", height: "100%", objectFit: "cover", objectPosition: "center top", display: "block" }} />
+            </div>
+            {/* Bottom: logo + name + tagline centered */}
+            <div style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: "24px 24px 48px" }}>
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src="/epk-logo.png" alt="CC Logo" style={{ width: 72, marginBottom: 14, display: "block", mixBlendMode: "multiply" }} />
+              <h1 style={{ fontFamily: "'Bootzy', serif", fontSize: "clamp(44px, 13vw, 72px)", lineHeight: 0.93, color: INK, margin: 0, letterSpacing: "-1px", textAlign: "center" }}>
+                CHANGING<br />CURRENTS
+              </h1>
+              <p style={{ fontSize: 9, letterSpacing: 5, color: MUTED, textTransform: "uppercase", marginTop: 16, marginBottom: 0, textAlign: "center" }}>
+                DJ &nbsp;/&nbsp; Producer
+              </p>
+              <p style={{
+                fontFamily: "'Homemade Apple', cursive",
+                fontSize: 13,
+                color: "rgba(0,0,0,0.45)",
+                margin: "14px 0 0 0",
+                lineHeight: 1,
+                transform: "rotate(-3deg)",
+                display: "inline-block",
+                transformOrigin: "center center",
+              }}>
+                cc baby!
+              </p>
+            </div>
+            <div style={{ position: "absolute", bottom: 16, left: "50%", transform: "translateX(-50%)", display: "flex", flexDirection: "column", alignItems: "center", gap: 4, zIndex: 3 }}>
+              <span style={{ fontSize: 9, letterSpacing: 4, color: INK, textTransform: "uppercase" }}>Scroll</span>
+              <ChevronDown size={11} color={INK} />
+            </div>
+          </section>
+        ) : (
+          /* Desktop hero: side-by-side */
+          <section id="hero" style={{ height: `calc(100vh - ${NAV_H}px)`, backgroundColor: BG, display: "flex", flexDirection: "row", overflow: "hidden", position: "relative" }}>
+            <div style={{ width: "44%", display: "flex", flexDirection: "column", justifyContent: "flex-end", alignItems: "center", padding: "0 0 72px 32px", flexShrink: 0, zIndex: 2 }}>
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src="/epk-logo.png" alt="CC Logo" style={{ width: "clamp(110px, 13vw, 165px)", marginBottom: 20, display: "block", mixBlendMode: "multiply" }} />
+              <h1 style={{ fontFamily: "'Bootzy', serif", fontSize: "clamp(56px, 7vw, 108px)", lineHeight: 0.93, color: INK, margin: 0, letterSpacing: "-1px", textAlign: "center" }}>
+                CHANGING<br />CURRENTS
+              </h1>
+              <p style={{ fontSize: 10, letterSpacing: 5, color: MUTED, textTransform: "uppercase", marginTop: 22, marginBottom: 0, textAlign: "center" }}>
+                DJ &nbsp;/&nbsp; Producer
+              </p>
+              <p style={{
+                fontFamily: "'Homemade Apple', cursive",
+                fontSize: "clamp(12px, 1.3vw, 18px)",
+                color: "rgba(0,0,0,0.45)",
+                margin: "20px 0 0 0",
+                lineHeight: 1,
+                transform: "rotate(-3deg)",
+                display: "inline-block",
+                transformOrigin: "center center",
+              }}>
+                cc baby!
+              </p>
+            </div>
+            <div style={{ flex: 1, display: "flex", alignItems: "flex-end", justifyContent: "center", position: "relative" }}>
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src="/epk-hero.png" alt="Changing Currents" style={{ height: "100%", width: "100%", objectFit: "contain", objectPosition: "center bottom" }} />
+            </div>
+            <div style={{ position: "absolute", bottom: 24, left: "50%", transform: "translateX(-50%)", display: "flex", flexDirection: "column", alignItems: "center", gap: 5, zIndex: 3 }}>
+              <span style={{ fontSize: 10, letterSpacing: 4, color: INK, textTransform: "uppercase" }}>Scroll</span>
+              <ChevronDown size={12} color={INK} />
+            </div>
+          </section>
+        )}
 
         {/* BIO */}
-        <section id="bio" style={{ ...snap, borderTop: `1px solid ${RULE}`, display: "flex", flexDirection: "column", justifyContent: "center", padding: "60px 80px" }}>
+        <section id="bio" style={{
+          ...snap,
+          borderTop: `1px solid ${RULE}`,
+          display: "flex",
+          flexDirection: "column",
+          justifyContent: "center",
+          padding: isMobile ? "52px 24px" : "60px 80px",
+        }}>
           <span style={{ display: "block", fontFamily: "'Bootzy', serif", fontSize: 36, letterSpacing: 3, color: INK, textTransform: "uppercase", marginBottom: 44 }}>Bio</span>
-          <p ref={bioTextRef} style={{ fontSize: "clamp(15px, 1.4vw, 19px)", lineHeight: 1.9, maxWidth: 820, margin: 0, color: INK }}>
+          <p ref={bioTextRef} style={{
+            fontSize: isMobile ? "clamp(13px, 3.5vw, 16px)" : "clamp(15px, 1.4vw, 19px)",
+            lineHeight: 1.9,
+            maxWidth: 820,
+            margin: 0,
+            color: INK,
+          }}>
             {bioWords}
           </p>
         </section>
@@ -690,10 +957,9 @@ export default function EPKPage() {
         {/* STATS */}
         <StatsSection />
 
-        {/* NOTABLE SHOWS */}
         {/* CAMPAIGN */}
         <section id="campaigns" style={{ ...snap, borderTop: `1px solid ${RULE}`, display: "flex", flexDirection: "column" }}>
-          <div style={{ padding: "52px 80px 36px", borderBottom: `1px solid ${RULE}`, flexShrink: 0 }}>
+          <div style={{ padding: isMobile ? "40px 24px 28px" : "52px 80px 36px", borderBottom: `1px solid ${RULE}`, flexShrink: 0 }}>
             <span style={{ fontFamily: "'Bootzy', serif", fontSize: 36, letterSpacing: 3, color: INK, textTransform: "uppercase" }}>Campaign</span>
           </div>
           <CampaignLayout />
@@ -701,114 +967,218 @@ export default function EPKPage() {
 
         {/* INTERVIEWS */}
         <section id="interviews" style={{ ...snap, borderTop: `1px solid ${RULE}`, display: "flex", flexDirection: "column" }}>
-          <div style={{ padding: "52px 80px 36px", borderBottom: `1px solid ${RULE}`, flexShrink: 0 }}>
+          <div style={{ padding: isMobile ? "40px 24px 28px" : "52px 80px 36px", borderBottom: `1px solid ${RULE}`, flexShrink: 0 }}>
             <span style={{ fontFamily: "'Bootzy', serif", fontSize: 36, letterSpacing: 3, color: INK, textTransform: "uppercase" }}>Interviews</span>
           </div>
-          <div style={{ flex: 1, display: "flex", flexDirection: "row", alignItems: "flex-start", gap: 16, padding: "0 40px 40px", overflowX: "auto", minHeight: 0 }}>
-            {INTERVIEWS.map((vid, i) => {
-              const vH = `calc((100vh - ${NAV_H}px) * 0.82)`;
-              const vW = `calc((100vh - ${NAV_H}px) * 0.82 * 9 / 16)`;
-              return (
-                <div key={i} style={{ display: "flex", flexDirection: "row", flexShrink: 0 }}>
-                  {/* Video */}
-                  <div style={{ width: vW, height: vH, position: "relative", backgroundColor: "#111", cursor: "pointer", overflow: "hidden" }}
-                    onClick={(e) => {
-                      const v = e.currentTarget.querySelector("video");
-                      if (v) v.paused ? v.play() : v.pause();
-                    }}
-                  >
-                    <video
-                      src={vid.src}
-                      style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }}
-                      playsInline
-                    />
-                    <div style={{ position: "absolute", inset: 0, display: "flex", alignItems: "center", justifyContent: "center", pointerEvents: "none" }}>
-                      <div style={{ width: 52, height: 52, borderRadius: "50%", backgroundColor: "rgba(0,0,0,0.4)", display: "flex", alignItems: "center", justifyContent: "center" }}>
-                        <Play size={16} color="#fff" style={{ marginLeft: 2 }} />
+
+          {isMobile ? (
+            /* Mobile: vertical stack of full-width portrait videos */
+            <div style={{ display: "flex", flexDirection: "column", gap: 0, padding: "0 0 40px" }}>
+              {INTERVIEWS.map((vid, i) => {
+                return (
+                  <div key={i} style={{ borderBottom: `1px solid ${RULE}` }}>
+                    {/* Full-width 9:16 video */}
+                    <div
+                      style={{ width: "100%", aspectRatio: "9 / 16", position: "relative", backgroundColor: "#111", cursor: "pointer", overflow: "hidden" }}
+                      onClick={(e) => {
+                        const v = e.currentTarget.querySelector("video");
+                        if (v) v.paused ? v.play() : v.pause();
+                      }}
+                    >
+                      <video
+                        src={vid.src}
+                        style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }}
+                        playsInline
+                      />
+                      <div style={{ position: "absolute", inset: 0, display: "flex", alignItems: "center", justifyContent: "center", pointerEvents: "none" }}>
+                        <div style={{ width: 52, height: 52, borderRadius: "50%", backgroundColor: "rgba(0,0,0,0.4)", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                          <Play size={16} color="#fff" style={{ marginLeft: 2 }} />
+                        </div>
                       </div>
                     </div>
+                    {/* Title / label / year below in a row */}
+                    <div style={{ display: "flex", alignItems: "baseline", gap: 16, padding: "14px 24px 16px" }}>
+                      <span style={{ fontFamily: "'Bootzy', serif", fontSize: 20, color: INK, lineHeight: 1.1, flex: 1 }}>{vid.title}</span>
+                      <span style={{ fontSize: 9, letterSpacing: 2, color: MUTED, textTransform: "uppercase", flexShrink: 0 }}>{vid.label}</span>
+                      <span style={{ fontSize: 9, letterSpacing: 2, color: FAINT, textTransform: "uppercase", flexShrink: 0 }}>{vid.year}</span>
+                    </div>
                   </div>
-                  {/* Info panel */}
-                  <div style={{ width: 120, height: vH, flexShrink: 0, borderLeft: `1px solid ${RULE}`, backgroundColor: BG, display: "flex", flexDirection: "column", justifyContent: "flex-end", padding: "0 18px 24px", gap: 5 }}>
-                    <p style={{ margin: 0, fontFamily: "'Bootzy', serif", fontSize: 18, color: INK, lineHeight: 1.2 }}>
-                      {vid.title}
-                    </p>
-                    <p style={{ margin: 0, fontSize: 11, letterSpacing: 1.5, color: MUTED, textTransform: "uppercase" }}>
-                      {vid.label}
-                    </p>
-                    <p style={{ margin: 0, fontSize: 11, letterSpacing: 1.5, color: FAINT, textTransform: "uppercase" }}>
-                      {vid.year}
-                    </p>
+                );
+              })}
+            </div>
+          ) : (
+            /* Desktop: horizontal scroll */
+            <div style={{ flex: 1, display: "flex", flexDirection: "row", alignItems: "flex-start", gap: 16, padding: "0 40px 40px", overflowX: "auto", minHeight: 0 }}>
+              {INTERVIEWS.map((vid, i) => {
+                const vH = `calc((100vh - ${NAV_H}px) * 0.82)`;
+                const vW = `calc((100vh - ${NAV_H}px) * 0.82 * 9 / 16)`;
+                return (
+                  <div key={i} style={{ display: "flex", flexDirection: "row", flexShrink: 0 }}>
+                    {/* Video */}
+                    <div style={{ width: vW, height: vH, position: "relative", backgroundColor: "#111", cursor: "pointer", overflow: "hidden" }}
+                      onClick={(e) => {
+                        const v = e.currentTarget.querySelector("video");
+                        if (v) v.paused ? v.play() : v.pause();
+                      }}
+                    >
+                      <video
+                        src={vid.src}
+                        style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }}
+                        playsInline
+                      />
+                      <div style={{ position: "absolute", inset: 0, display: "flex", alignItems: "center", justifyContent: "center", pointerEvents: "none" }}>
+                        <div style={{ width: 52, height: 52, borderRadius: "50%", backgroundColor: "rgba(0,0,0,0.4)", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                          <Play size={16} color="#fff" style={{ marginLeft: 2 }} />
+                        </div>
+                      </div>
+                    </div>
+                    {/* Info panel */}
+                    <div style={{ width: 120, height: vH, flexShrink: 0, borderLeft: `1px solid ${RULE}`, backgroundColor: BG, display: "flex", flexDirection: "column", justifyContent: "flex-end", padding: "0 18px 24px", gap: 5 }}>
+                      <p style={{ margin: 0, fontFamily: "'Bootzy', serif", fontSize: 18, color: INK, lineHeight: 1.2 }}>
+                        {vid.title}
+                      </p>
+                      <p style={{ margin: 0, fontSize: 11, letterSpacing: 1.5, color: MUTED, textTransform: "uppercase" }}>
+                        {vid.label}
+                      </p>
+                      <p style={{ margin: 0, fontSize: 11, letterSpacing: 1.5, color: FAINT, textTransform: "uppercase" }}>
+                        {vid.year}
+                      </p>
+                    </div>
                   </div>
-                </div>
-              );
-            })}
-          </div>
+                );
+              })}
+            </div>
+          )}
         </section>
 
         {/* NOTABLE SHOWS */}
         <section id="shows" style={{ ...snap, borderTop: `1px solid ${RULE}`, display: "flex", flexDirection: "column" }}>
-          <div style={{ padding: "52px 80px 36px", borderBottom: `1px solid ${RULE}`, flexShrink: 0 }}>
+          <div style={{ padding: isMobile ? "40px 24px 28px" : "52px 80px 36px", borderBottom: `1px solid ${RULE}`, flexShrink: 0 }}>
             <span style={{ fontFamily: "'Bootzy', serif", fontSize: 36, letterSpacing: 3, color: INK, textTransform: "uppercase" }}>Notable Shows</span>
           </div>
-          <div style={{ flex: 1, display: "flex", flexDirection: "column", justifyContent: "center", padding: "0 80px" }}>
+          <div style={{ flex: 1, display: "flex", flexDirection: "column", justifyContent: "center", padding: isMobile ? "0 24px" : "0 80px" }}>
             {SHOWS.map((show, i) => (
-              <div key={i} style={{
-                display: "flex", alignItems: "baseline", justifyContent: "space-between",
-                borderBottom: `1px solid ${RULE}`, padding: "28px 0",
-              }}>
-                <div style={{ display: "flex", alignItems: "baseline", gap: 40, flex: 1 }}>
-                  <span style={{ fontSize: 11, color: FAINT, width: 24, flexShrink: 0 }}>
-                    {String(i + 1).padStart(2, "0")}
-                  </span>
-                  <span style={{ fontFamily: "'Bootzy', serif", fontSize: 28, color: INK, letterSpacing: 1 }}>
-                    {show.venue}{show.location ? `, ${show.location}` : ""}
-                  </span>
+              isMobile ? (
+                /* Mobile: tighter rows, venue wraps, date/note stacked right */
+                <div key={i} style={{
+                  display: "flex", alignItems: "flex-start", justifyContent: "space-between",
+                  borderBottom: `1px solid ${RULE}`, padding: "18px 0",
+                  gap: 12,
+                }}>
+                  <div style={{ display: "flex", alignItems: "flex-start", gap: 16, flex: 1 }}>
+                    <span style={{ fontSize: 10, color: FAINT, width: 20, flexShrink: 0, paddingTop: 3 }}>
+                      {String(i + 1).padStart(2, "0")}
+                    </span>
+                    <span style={{ fontFamily: "'Bootzy', serif", fontSize: 20, color: INK, letterSpacing: 0.5, lineHeight: 1.2 }}>
+                      {show.venue}{show.location ? `, ${show.location}` : ""}
+                    </span>
+                  </div>
+                  <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-end", gap: 4, flexShrink: 0 }}>
+                    <span style={{ fontSize: 10, letterSpacing: 1.5, color: INK, textTransform: "uppercase" }}>
+                      {show.note}
+                    </span>
+                    <span style={{ fontSize: 10, letterSpacing: 1.5, color: INK, textTransform: "uppercase" }}>
+                      {show.date}
+                    </span>
+                  </div>
                 </div>
-                <div style={{ display: "flex", alignItems: "baseline", gap: 48 }}>
-                  <span style={{ fontSize: 11, letterSpacing: 1.5, color: INK, textTransform: "uppercase", width: 130, textAlign: "right" }}>
-                    {show.note}
-                  </span>
-                  <span style={{ fontSize: 11, letterSpacing: 1.5, color: INK, textTransform: "uppercase", width: 40, textAlign: "right" }}>
-                    {show.date}
-                  </span>
+              ) : (
+                /* Desktop */
+                <div key={i} style={{
+                  display: "flex", alignItems: "baseline", justifyContent: "space-between",
+                  borderBottom: `1px solid ${RULE}`, padding: "28px 0",
+                }}>
+                  <div style={{ display: "flex", alignItems: "baseline", gap: 40, flex: 1 }}>
+                    <span style={{ fontSize: 11, color: FAINT, width: 24, flexShrink: 0 }}>
+                      {String(i + 1).padStart(2, "0")}
+                    </span>
+                    <span style={{ fontFamily: "'Bootzy', serif", fontSize: 28, color: INK, letterSpacing: 1 }}>
+                      {show.venue}{show.location ? `, ${show.location}` : ""}
+                    </span>
+                  </div>
+                  <div style={{ display: "flex", alignItems: "baseline", gap: 48 }}>
+                    <span style={{ fontSize: 11, letterSpacing: 1.5, color: INK, textTransform: "uppercase", width: 130, textAlign: "right" }}>
+                      {show.note}
+                    </span>
+                    <span style={{ fontSize: 11, letterSpacing: 1.5, color: INK, textTransform: "uppercase", width: 40, textAlign: "right" }}>
+                      {show.date}
+                    </span>
+                  </div>
                 </div>
-              </div>
+              )
             ))}
           </div>
         </section>
 
         {/* SERVICES */}
-        <section id="services" style={{ ...snap, borderTop: `1px solid ${RULE}`, display: "flex", flexDirection: "column", padding: "52px 80px" }}>
+        <section id="services" style={{ ...snap, borderTop: `1px solid ${RULE}`, display: "flex", flexDirection: "column", padding: isMobile ? "40px 24px" : "52px 80px" }}>
           <span style={{ display: "block", fontFamily: "'Bootzy', serif", fontSize: 36, letterSpacing: 3, color: INK, textTransform: "uppercase", marginBottom: 44 }}>
             Talent &amp; Creative Services
           </span>
           <div style={{ display: "flex", flexDirection: "column" }}>
             {SERVICES.map((s) => (
-              <div key={s.category} className="service-row" style={{ display: "flex", alignItems: "baseline", gap: 60, borderTop: `1px solid ${RULE}`, padding: "26px 0" }}>
-                <span style={{ fontSize: 10, letterSpacing: 3, color: INK, textTransform: "uppercase", width: 170, flexShrink: 0 }}>{s.category}</span>
-                <span style={{ fontSize: 15, color: INK, letterSpacing: 0.3 }}>{s.items}</span>
-              </div>
+              isMobile ? (
+                /* Mobile: category label above items, stacked */
+                <div key={s.category} className="service-row" style={{ borderTop: `1px solid ${RULE}`, padding: "20px 0" }}>
+                  <span style={{ display: "block", fontSize: 9, letterSpacing: 3, color: INK, textTransform: "uppercase", marginBottom: 10 }}>{s.category}</span>
+                  <span style={{ fontSize: 14, color: INK, letterSpacing: 0.2, lineHeight: 1.6 }}>{s.items}</span>
+                </div>
+              ) : (
+                /* Desktop: side-by-side */
+                <div key={s.category} className="service-row" style={{ display: "flex", alignItems: "baseline", gap: 60, borderTop: `1px solid ${RULE}`, padding: "26px 0" }}>
+                  <span style={{ fontSize: 10, letterSpacing: 3, color: INK, textTransform: "uppercase", width: 170, flexShrink: 0 }}>{s.category}</span>
+                  <span style={{ fontSize: 15, color: INK, letterSpacing: 0.3 }}>{s.items}</span>
+                </div>
+              )
             ))}
-            <div className="service-row" style={{ borderTop: `1px solid ${RULE}`, padding: "26px 0", paddingLeft: 230 }}>
-              <span style={{ fontSize: 11, color: INK, letterSpacing: 2, textTransform: "uppercase" }}>And more</span>
-            </div>
+            {isMobile ? (
+              <div className="service-row" style={{ borderTop: `1px solid ${RULE}`, padding: "20px 0" }}>
+                <span style={{ fontSize: 11, color: INK, letterSpacing: 2, textTransform: "uppercase" }}>And more</span>
+              </div>
+            ) : (
+              <div className="service-row" style={{ borderTop: `1px solid ${RULE}`, padding: "26px 0", paddingLeft: 230 }}>
+                <span style={{ fontSize: 11, color: INK, letterSpacing: 2, textTransform: "uppercase" }}>And more</span>
+              </div>
+            )}
           </div>
         </section>
 
         {/* BOOKING */}
-        <section id="booking" style={{ ...snap, borderTop: `1px solid ${RULE}`, display: "flex", flexDirection: "column", justifyContent: "center", padding: "60px 80px" }}>
-          <div className="contact-inner">
+        <section id="booking" style={{ ...snap, borderTop: `1px solid ${RULE}`, display: "flex", flexDirection: "column", justifyContent: "center", padding: isMobile ? "60px 24px" : "60px 80px", alignItems: isMobile ? "center" : "flex-start", textAlign: isMobile ? "center" : "left" }}>
+          <div className="contact-inner" style={{ width: "100%" }}>
             <span style={{ display: "block", fontFamily: "'Bootzy', serif", fontSize: 36, letterSpacing: 3, color: INK, textTransform: "uppercase", marginBottom: 44 }}>Get In Touch</span>
-            <p style={{ fontSize: 11, letterSpacing: 1.5, color: INK, textTransform: "uppercase", margin: "0 0 12px" }}>Contact</p>
-            <p style={{ fontFamily: "'NeueHaas', 'Helvetica Neue', sans-serif", fontSize: 15, color: INK, margin: 0, letterSpacing: 0.3 }}>
-              cc@changingcurrents.co.uk
-            </p>
+            {isMobile ? (
+              /* Mobile: large mailto tap target in Bootzy font */
+              <a
+                href="mailto:cc@changingcurrents.co.uk"
+                style={{
+                  display: "block",
+                  fontFamily: "'Bootzy', serif",
+                  fontSize: "clamp(18px, 5vw, 28px)",
+                  color: INK,
+                  textDecoration: "none",
+                  letterSpacing: 0.5,
+                  lineHeight: 1.3,
+                  padding: "16px 0",
+                  borderTop: `1px solid ${RULE}`,
+                  borderBottom: `1px solid ${RULE}`,
+                }}
+              >
+                cc@changingcurrents.co.uk
+              </a>
+            ) : (
+              <>
+                <p style={{ fontSize: 11, letterSpacing: 1.5, color: INK, textTransform: "uppercase", margin: "0 0 12px" }}>Contact</p>
+                <p style={{ fontFamily: "'NeueHaas', 'Helvetica Neue', sans-serif", fontSize: 15, color: INK, margin: 0, letterSpacing: 0.3 }}>
+                  cc@changingcurrents.co.uk
+                </p>
+              </>
+            )}
           </div>
         </section>
 
         {/* Footer */}
-        <div style={{ borderTop: `1px solid ${RULE}`, padding: "28px 80px", display: "flex", justifyContent: "space-between",  }}>
+        <div style={{ borderTop: `1px solid ${RULE}`, padding: isMobile ? "28px 24px" : "28px 80px", display: "flex", justifyContent: "space-between" }}>
           <span style={{ fontSize: 9, letterSpacing: 3, color: FAINT, textTransform: "uppercase" }}>© Changing Currents</span>
           <span style={{ fontSize: 9, letterSpacing: 3, color: FAINT, textTransform: "uppercase" }}>@changingcurrents</span>
         </div>
