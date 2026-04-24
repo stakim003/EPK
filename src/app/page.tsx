@@ -22,9 +22,9 @@ const TABS = [
 ];
 
 const INTERVIEWS = [
-  { src: "/interviews/nl-times.mov", title: "NL Times",   year: "2025", label: "Canada" },
-  { src: "/interview-1.mp4",         title: "Come Spin!", year: "2024", label: "Interview" },
-  { src: "/interviews/yammat-fm.mp4", title: "Yammat FM",  year: "2025", label: "Croatia" },
+  { src: "/interviews/nl-times.mov", poster: "/posters/nl-times.jpg",     title: "NL Times",   year: "2025", label: "Canada" },
+  { src: "/interview-1.mp4",         poster: "/posters/interview-1.jpg",   title: "Come Spin!", year: "2024", label: "Interview" },
+  { src: "/interviews/yammat-fm.mp4", poster: "/posters/yammat-fm.jpg",   title: "Yammat FM",  year: "2025", label: "Croatia" },
 ];
 
 const BIO =
@@ -576,7 +576,7 @@ function CampaignLayout() {
               setPlaying(!playing);
             }}
           >
-            <video ref={videoRef} src={vid.src} style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} playsInline onEnded={() => setPlaying(false)} />
+            <video ref={videoRef} src={vid.src} preload="none" style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} playsInline onEnded={() => setPlaying(false)} />
             {!playing && (
               <div style={{ position: "absolute", inset: 0, display: "flex", alignItems: "center", justifyContent: "center" }}>
                 <div style={{ width: 52, height: 52, borderRadius: "50%", backgroundColor: "rgba(0,0,0,0.45)", display: "flex", alignItems: "center", justifyContent: "center" }}>
@@ -1090,6 +1090,8 @@ export default function EPKPage() {
                     >
                       <video
                         src={vid.src}
+                        poster={vid.poster}
+                        preload="none"
                         style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }}
                         playsInline
                       />
@@ -1126,6 +1128,8 @@ export default function EPKPage() {
                     >
                       <video
                         src={vid.src}
+                        poster={vid.poster}
+                        preload="none"
                         style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }}
                         playsInline
                       />
