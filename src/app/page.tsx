@@ -67,16 +67,16 @@ const INSTA_TOP = [
 ];
 
 const TIKTOK_TOP = [
-  { views: "4.5M", likes: "427K", shares: "22K", saves: "77K", comments: "1,765", url: "https://vm.tiktok.com/ZNRbL1wEP/" },
-  { views: "2.4M", likes: "379K", shares: "8,963", saves: "49K", comments: "3,517", url: "https://vm.tiktok.com/ZNRbLM7gD/" },
-  { views: "1.9M", likes: "223K", shares: "9,986", saves: "27K", comments: "670",   url: "https://vm.tiktok.com/ZNRbLRmeJ/" },
-  { views: "1.7M", likes: "187K", shares: "3,781", saves: "23K", comments: "998",   url: "https://vm.tiktok.com/ZNRbLko5B/" },
-  { views: "1.5M", likes: "223K", shares: "18K",   saves: "18K", comments: "1,155", url: "https://vm.tiktok.com/ZNRbLkrD6/" },
-  { views: "1.3M", likes: "111K", shares: "4,311", saves: "20K", comments: "1,354", url: "https://vm.tiktok.com/ZNRbLFbKp/" },
-  { views: "1.1M", likes: "114K", shares: "7,166", saves: "14K", comments: "535",   url: "https://vm.tiktok.com/ZNRbL8WA3/" },
-  { views: "1M",   likes: "103K", shares: "5,822", saves: "18K", comments: "364",   url: "https://vm.tiktok.com/ZNRbLdct1/" },
-  { views: "829K", likes: "127K", shares: "5,065", saves: "14K", comments: "281",   url: "https://vm.tiktok.com/ZNRbLJp23/" },
-  { views: "747K", likes: "107K", shares: "3,847", saves: "11K", comments: "204",   url: "https://vm.tiktok.com/ZNRbL1TMU/" },
+  { caption: "On top of the world 🥹 Mashup ID ~ JusJay",                views: "4.5M", likes: "427K", shares: "22K",   saves: "77K", comments: "1,765", url: "https://vm.tiktok.com/ZNRbL1wEP/" },
+  { caption: "Full set up now on my youtube! @fzn.ent . MASHU...",        views: "2.4M", likes: "379K", shares: "8,963", saves: "49K", comments: "3,517", url: "https://vm.tiktok.com/ZNRbLM7gD/" },
+  { caption: "I play music from all around the world, it's a journey...", views: "1.9M", likes: "223K", shares: "9,986", saves: "27K", comments: "670",   url: "https://vm.tiktok.com/ZNRbLRmeJ/" },
+  { caption: "Bringing this energy to Amsterdam 👇",                      views: "1.7M", likes: "187K", shares: "3,781", saves: "23K", comments: "998",   url: "https://vm.tiktok.com/ZNRbLko5B/" },
+  { caption: "I was ready JT ~ Day 2 of posting until @boilerroom...",    views: "1.5M", likes: "223K", shares: "18K",   saves: "18K", comments: "1,155", url: "https://vm.tiktok.com/ZNRbLkrD6/" },
+  { caption: "My love for Punjabi music has been going on for years...",  views: "1.3M", likes: "111K", shares: "4,311", saves: "20K", comments: "1,354", url: "https://vm.tiktok.com/ZNRbLFbKp/" },
+  { caption: "COMBINAAAATION",                                             views: "1.1M", likes: "114K", shares: "7,166", saves: "14K", comments: "535",   url: "https://vm.tiktok.com/ZNRbL8WA3/" },
+  { caption: "luv u london <3",                                            views: "1M",   likes: "103K", shares: "5,822", saves: "18K", comments: "364",   url: "https://vm.tiktok.com/ZNRbLdct1/" },
+  { caption: "I'm always making friends with the crowd 🤣❤️",             views: "829K", likes: "127K", shares: "5,065", saves: "14K", comments: "281",   url: "https://vm.tiktok.com/ZNRbLJp23/" },
+  { caption: "The week before I played to thousands at Glastonbury...",   views: "747K", likes: "107K", shares: "3,847", saves: "11K", comments: "204",   url: "https://vm.tiktok.com/ZNRbL1TMU/" },
 ];
 
 const SOUNDCLOUD_TOP = [
@@ -107,22 +107,16 @@ const SHOOT_PHOTOS = [
   "/shoots/DSC09460.jpg",
   "/shoots/DSC09629.jpeg",
   "/shoots/DSC09834.jpg",
-  "/shoots/DSC03048.jpg",
-  "/shoots/DSC09535.jpg",
-  "/shoots/IMG_6929.JPG",
-  "/shoots/883419850018.jpg",
   "/shoots/97B0C32F-0B5A-4493-99DB-B46D6A4423A4.JPG",
   "/shoots/PHOTO-2024-03-02-15-48-23 2.jpg",
 ];
 
 // Per-image objectPosition overrides (default is "center")
-const SHOOT_POSITIONS: Record<string, string> = {
-  "/shoots/DSC03048.jpg": "top",
-};
+const SHOOT_POSITIONS: Record<string, string> = {};
 
 // All full — uniform frame matching the first photo
 const SHOOT_LAYOUT: ("full" | "pair")[] = [
-  "full", "full", "full", "full", "full", "full", "full", "full", "full", "full", "full",
+  "full", "full", "full", "full", "full", "full", "full",
 ];
 
 // ── useIsMobile hook ─────────────────────────────────────
@@ -190,13 +184,15 @@ function StatsSection() {
           bottom: 0,
           left: 0,
           right: 0,
-          height: 100,
-          background: `linear-gradient(to bottom, transparent, ${BG})`,
+          height: 110,
+          background: `linear-gradient(to bottom, transparent 0%, rgba(245,243,238,0.6) 40%, ${BG} 100%)`,
+          backdropFilter: "blur(6px)",
+          WebkitBackdropFilter: "blur(6px)",
           zIndex: 1,
           display: "flex",
           alignItems: "flex-end",
           justifyContent: "center",
-          paddingBottom: 12,
+          paddingBottom: 14,
         }}>
           <button
             onClick={() => setShowAll(true)}
@@ -207,7 +203,9 @@ function StatsSection() {
               textTransform: "uppercase",
               color: INK,
               background: "none",
-              border: "none",
+              border: `1px solid ${RULE}`,
+              borderRadius: 2,
+              padding: "7px 18px",
               cursor: "pointer",
               fontFamily: "inherit",
             }}
@@ -323,8 +321,10 @@ function StatsSection() {
                     </div>
                   )}
                 </div>
-                {/* Caption — hide on mobile */}
-                {!isMobile && (
+                {/* Caption */}
+                {isMobile ? (
+                  <span style={{ display: "block", fontSize: 11, color: MUTED, marginTop: 6, marginBottom: 14, lineHeight: 1.4 }}>{post.caption}</span>
+                ) : (
                   <span style={{ flex: 1, fontSize: 12, color: MUTED, letterSpacing: 0.2, paddingRight: 24 }}>{post.caption}</span>
                 )}
                 {/* Secondary stats — desktop only inline */}
@@ -379,6 +379,9 @@ function StatsSection() {
                       ))}
                     </div>
                   )}
+                  {isMobile && post.caption && (
+                    <span style={{ display: "block", fontSize: 11, color: MUTED, marginTop: 6, marginBottom: 14, lineHeight: 1.4 }}>{post.caption}</span>
+                  )}
                 </div>
                 {!isMobile && <div style={{ flex: 1 }} />}
                 {!isMobile && (
@@ -419,9 +422,15 @@ function StatsSection() {
                 {!isMobile && (
                   <span style={{ width: 36, fontSize: 11, color: FAINT, flexShrink: 0 }}>{String(i + 1).padStart(2, "0")}</span>
                 )}
-                <span style={{ width: isMobile ? "auto" : 160, fontFamily: "'Bootzy', serif", fontSize: "clamp(32px, 9vw, 52px)", color: INK, lineHeight: 1, padding: "18px 0", flexShrink: 0 }}>
-                  {track.plays}
-                </span>
+                <div style={{ padding: "18px 0", flexShrink: 0 }}>
+                  <span style={{ fontFamily: "'Bootzy', serif", fontSize: "clamp(32px, 9vw, 52px)", color: INK, lineHeight: 1, display: "block" }}>
+                    {track.plays}
+                  </span>
+                  <div style={{ fontSize: 10, letterSpacing: 2, color: INK, textTransform: "uppercase", marginTop: 6 }}>Plays</div>
+                  {isMobile && (
+                    <span style={{ display: "block", fontSize: 11, color: MUTED, marginTop: 6, marginBottom: 6, lineHeight: 1.4 }}>{track.title}</span>
+                  )}
+                </div>
                 {!isMobile && (
                   <span style={{ flex: 1, fontFamily: "'Bootzy', serif", fontSize: 22, color: INK, letterSpacing: 1 }}>{track.title}</span>
                 )}
@@ -466,6 +475,9 @@ function StatsSection() {
                         <span style={{ fontSize: 8, letterSpacing: 1.5, color: MUTED, textTransform: "uppercase", marginLeft: 4 }}>Likes</span>
                       </div>
                     </div>
+                  )}
+                  {isMobile && (
+                    <span style={{ display: "block", fontSize: 11, color: MUTED, marginTop: 6, marginBottom: 6, lineHeight: 1.4 }}>{vid.title}</span>
                   )}
                 </div>
                 {!isMobile && (
@@ -558,11 +570,12 @@ function CampaignLayout() {
             <p style={{ margin: 0, fontFamily: "'Bootzy', serif", fontSize: 22, color: "#fff", lineHeight: 1 }}>{vid.brand}</p>
             <p style={{ margin: 0, fontSize: 9, letterSpacing: 3, color: "rgba(255,255,255,0.6)", textTransform: "uppercase", marginTop: 5 }}>{vid.label} — {vid.year}</p>
           </div>
-          {/* Scroll down hint */}
-          <div style={{ position: "absolute", bottom: 20, right: 20, display: "flex", flexDirection: "column", alignItems: "center", gap: 3 }}>
-            <span style={{ fontSize: 7, letterSpacing: 3, color: "rgba(255,255,255,0.55)", textTransform: "uppercase" }}>Scroll</span>
-            <ChevronDown size={10} color="rgba(255,255,255,0.55)" />
-          </div>
+        </div>
+
+        {/* Swipe hint above photo row */}
+        <div style={{ display: "flex", alignItems: "center", gap: 6, padding: "10px 16px 6px" }}>
+          <span style={{ fontSize: 8, letterSpacing: 3, color: MUTED, textTransform: "uppercase" }}>Swipe</span>
+          <span style={{ fontSize: 13, color: MUTED }}>→</span>
         </div>
 
         {/* Photo scroll bar — horizontal, below video */}
