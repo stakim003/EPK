@@ -545,7 +545,7 @@ function CampaignLayout() {
 
       {/* Photos + right fade */}
       <div style={{ flex: 1, position: "relative", minHeight: 0, overflow: "hidden" }}>
-        <div style={{ position: "absolute", right: 0, top: 0, bottom: 0, width: 120, background: `linear-gradient(to right, transparent, ${BG})`, zIndex: 2, pointerEvents: "none" }} />
+        <div style={{ position: "absolute", right: 0, top: 0, bottom: 0, width: isMobile ? 48 : 120, background: `linear-gradient(to right, transparent, ${BG})`, zIndex: 2, pointerEvents: "none" }} />
 
         <div ref={scrollContainerRef} onScroll={handleScroll}
           onMouseDown={onMouseDown}
@@ -557,7 +557,7 @@ function CampaignLayout() {
             flexDirection: "row",
             alignItems: "flex-start",
             gap: 3,
-            padding: "0 0 40px 40px",
+            padding: isMobile ? "0 0 40px 0" : "0 0 40px 40px",
             overflowX: "auto",
             height: "100%",
             scrollbarWidth: "none",
@@ -576,7 +576,7 @@ function CampaignLayout() {
               setPlaying(!playing);
             }}
           >
-            <video ref={videoRef} src={vid.src} preload="none" style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} playsInline onEnded={() => setPlaying(false)} />
+            <video ref={videoRef} src={vid.src} poster="/posters/brand-shoot-1.jpg" preload="none" style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} playsInline onEnded={() => setPlaying(false)} />
             {!playing && (
               <div style={{ position: "absolute", inset: 0, display: "flex", alignItems: "center", justifyContent: "center" }}>
                 <div style={{ width: 52, height: 52, borderRadius: "50%", backgroundColor: "rgba(0,0,0,0.45)", display: "flex", alignItems: "center", justifyContent: "center" }}>
