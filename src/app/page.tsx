@@ -105,11 +105,9 @@ const SHOOT_PHOTOS = [
   "/shoots/DSC03692.jpg",
   "/shoots/DSC09311.jpeg",
   "/shoots/DSC09460.jpg",
-  "/shoots/DSC09157.jpeg",
   "/shoots/DSC09629.jpeg",
   "/shoots/DSC09834.jpg",
   "/shoots/DSC03048.jpg",
-  "/shoots/DSC03120.jpg",
   "/shoots/DSC09535.jpg",
   "/shoots/IMG_6929.JPG",
   "/shoots/883419850018.jpg",
@@ -122,9 +120,9 @@ const SHOOT_POSITIONS: Record<string, string> = {
   "/shoots/DSC03048.jpg": "top",
 };
 
-// Layout pattern: "full" = full height, "pair" = two stacked half-height
+// All full — uniform frame matching the first photo
 const SHOOT_LAYOUT: ("full" | "pair")[] = [
-  "full", "pair", "full", "full", "pair", "full", "pair", "full",
+  "full", "full", "full", "full", "full", "full", "full", "full", "full", "full", "full",
 ];
 
 // ── useIsMobile hook ─────────────────────────────────────
@@ -541,7 +539,7 @@ function CampaignLayout() {
       <div style={{ display: "flex", flexDirection: "column" }}>
         {/* Video — full viewport height, full width, tap to play */}
         <div
-          style={{ position: "relative", width: "100%", height: `calc(100vh - ${NAV_H}px)`, backgroundColor: "#0a0a0a", cursor: "pointer", overflow: "hidden", flexShrink: 0 }}
+          style={{ position: "relative", width: "100%", height: `calc(100vh - ${NAV_H}px - 68px)`, backgroundColor: "#0a0a0a", cursor: "pointer", overflow: "hidden", flexShrink: 0 }}
           onClick={() => {
             if (!videoRef.current) return;
             if (videoRef.current.paused) { videoRef.current.play(); setPlaying(true); }
@@ -1039,8 +1037,8 @@ export default function EPKPage() {
 
         {/* HERO */}
         {isMobile ? (
-          /* Mobile hero: full-height photo with text overlaid at bottom */
-          <section id="hero" style={{ height: `calc(100vh - ${NAV_H}px)`, position: "relative", overflow: "hidden", backgroundColor: BG }}>
+          /* Mobile hero: photo with text overlaid, ends at ~70vh */
+          <section id="hero" style={{ height: "70vh", position: "relative", overflow: "hidden", backgroundColor: BG }}>
             {/* Photo fills entire hero */}
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img src="/epk-hero.png" alt="Changing Currents" style={{ width: "100%", height: "100%", objectFit: "cover", objectPosition: "top center", display: "block" }} />
@@ -1157,12 +1155,12 @@ export default function EPKPage() {
           </div>
 
           {isMobile ? (
-            /* Mobile: vertical stack of full-width portrait videos */
-            <div style={{ display: "flex", flexDirection: "column", gap: 0, padding: "0 0 40px" }}>
+            /* Mobile: side-by-side horizontal scroll */
+            <div style={{ overflowX: "auto", scrollbarWidth: "none", WebkitOverflowScrolling: "touch" as React.CSSProperties["WebkitOverflowScrolling"], display: "flex", flexDirection: "row", gap: 3, padding: "0 0 32px 0" }}>
               {INTERVIEWS.map((vid, i) => {
+                const VW = "72vw";
                 return (
-                  <div key={i} style={{ borderBottom: `1px solid ${RULE}` }}>
-                    {/* Full-width 9:16 video */}
+                  <div key={i} style={{ width: VW, flexShrink: 0 }}>
                     <div
                       style={{ width: "100%", aspectRatio: "9 / 16", position: "relative", backgroundColor: "#111", cursor: "pointer", overflow: "hidden" }}
                       onClick={(e) => {
@@ -1178,22 +1176,22 @@ export default function EPKPage() {
                         playsInline
                       />
                       <div style={{ position: "absolute", inset: 0, display: "flex", alignItems: "center", justifyContent: "center", pointerEvents: "none" }}>
-                        <div style={{ width: 52, height: 52, borderRadius: "50%", backgroundColor: "rgba(0,0,0,0.4)", display: "flex", alignItems: "center", justifyContent: "center" }}>
-                          <Play size={16} color="#fff" style={{ marginLeft: 2 }} />
+                        <div style={{ width: 44, height: 44, borderRadius: "50%", backgroundColor: "rgba(0,0,0,0.4)", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                          <Play size={14} color="#fff" style={{ marginLeft: 2 }} />
                         </div>
                       </div>
                       {/* Title overlay — bottom of video */}
                       <div style={{
                         position: "absolute", bottom: 0, left: 0, right: 0,
-                        background: "linear-gradient(to bottom, transparent, rgba(0,0,0,0.6))",
-                        padding: "32px 20px 18px",
+                        background: "linear-gradient(to bottom, transparent, rgba(0,0,0,0.65))",
+                        padding: "28px 14px 14px",
                         pointerEvents: "none",
                       }}>
                         <div style={{ display: "flex", alignItems: "flex-end", justifyContent: "space-between" }}>
-                          <span style={{ fontFamily: "'Bootzy', serif", fontSize: 22, color: "#fff", lineHeight: 1.1 }}>{vid.title}</span>
+                          <span style={{ fontFamily: "'Bootzy', serif", fontSize: 18, color: "#fff", lineHeight: 1.1 }}>{vid.title}</span>
                           <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-end", gap: 2 }}>
-                            <span style={{ fontSize: 8, letterSpacing: 2, color: "rgba(255,255,255,0.7)", textTransform: "uppercase" }}>{vid.label}</span>
-                            <span style={{ fontSize: 8, letterSpacing: 2, color: "rgba(255,255,255,0.5)", textTransform: "uppercase" }}>{vid.year}</span>
+                            <span style={{ fontSize: 7, letterSpacing: 2, color: "rgba(255,255,255,0.75)", textTransform: "uppercase" }}>{vid.label}</span>
+                            <span style={{ fontSize: 7, letterSpacing: 2, color: "rgba(255,255,255,0.5)", textTransform: "uppercase" }}>{vid.year}</span>
                           </div>
                         </div>
                       </div>
