@@ -533,6 +533,62 @@ function CampaignLayout() {
 
   const onMouseUp = () => { dragStart.current = null; setDragging(false); };
 
+  if (isMobile) {
+    return (
+      <div style={{ display: "flex", flexDirection: "column" }}>
+        {/* Video — full width, 75vh tall, tap to play */}
+        <div
+          style={{ position: "relative", width: "100%", height: "75vh", backgroundColor: "#0a0a0a", cursor: "pointer", overflow: "hidden" }}
+          onClick={() => {
+            if (!videoRef.current) return;
+            if (videoRef.current.paused) { videoRef.current.play(); setPlaying(true); }
+            else { videoRef.current.pause(); setPlaying(false); }
+          }}
+        >
+          <video ref={videoRef} src={vid.src} poster="/posters/brand-shoot-1.jpg" preload="none" style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} playsInline onEnded={() => setPlaying(false)} />
+          {!playing && (
+            <div style={{ position: "absolute", inset: 0, display: "flex", alignItems: "center", justifyContent: "center" }}>
+              <div style={{ width: 56, height: 56, borderRadius: "50%", backgroundColor: "rgba(0,0,0,0.45)", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                <Play size={18} color="#fff" style={{ marginLeft: 3 }} />
+              </div>
+            </div>
+          )}
+          <div style={{ position: "absolute", bottom: 20, left: 20 }}>
+            <p style={{ margin: 0, fontFamily: "'Bootzy', serif", fontSize: 22, color: "#fff", lineHeight: 1 }}>{vid.brand}</p>
+            <p style={{ margin: 0, fontSize: 9, letterSpacing: 3, color: "rgba(255,255,255,0.6)", textTransform: "uppercase", marginTop: 5 }}>{vid.label} — {vid.year}</p>
+          </div>
+        </div>
+
+        {/* Photos — vertical stack, scroll down to browse */}
+        <div style={{ display: "flex", flexDirection: "column", gap: 3, paddingTop: 3 }}>
+          {slots.map((slot, i) => {
+            if (slot.type === "full") {
+              return (
+                <div key={i} style={{ width: "100%", aspectRatio: "4/5", overflow: "hidden" }}>
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img src={slot.src} alt="" loading="lazy" decoding="async" style={{ width: "100%", height: "100%", objectFit: "cover", objectPosition: SHOOT_POSITIONS[slot.src] ?? "center", display: "block" }} />
+                </div>
+              );
+            }
+            const pair = slot as { type: "pair"; top: string; bottom: string };
+            return (
+              <div key={i} style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 3 }}>
+                <div style={{ aspectRatio: "3/4", overflow: "hidden" }}>
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img src={pair.top} alt="" loading="lazy" decoding="async" style={{ width: "100%", height: "100%", objectFit: "cover", objectPosition: SHOOT_POSITIONS[pair.top] ?? "center", display: "block" }} />
+                </div>
+                <div style={{ aspectRatio: "3/4", overflow: "hidden" }}>
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img src={pair.bottom} alt="" loading="lazy" decoding="async" style={{ width: "100%", height: "100%", objectFit: "cover", objectPosition: SHOOT_POSITIONS[pair.bottom] ?? "center", display: "block" }} />
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div style={{ flex: 1, display: "flex", flexDirection: "column", minHeight: 0, overflow: "hidden" }}>
 
@@ -545,7 +601,7 @@ function CampaignLayout() {
 
       {/* Photos + right fade */}
       <div style={{ flex: 1, position: "relative", minHeight: 0, overflow: "hidden" }}>
-        <div style={{ position: "absolute", right: 0, top: 0, bottom: 0, width: isMobile ? 48 : 120, background: `linear-gradient(to right, transparent, ${BG})`, zIndex: 2, pointerEvents: "none" }} />
+        <div style={{ position: "absolute", right: 0, top: 0, bottom: 0, width: 120, background: `linear-gradient(to right, transparent, ${BG})`, zIndex: 2, pointerEvents: "none" }} />
 
         <div ref={scrollContainerRef} onScroll={handleScroll}
           onMouseDown={onMouseDown}
@@ -557,12 +613,12 @@ function CampaignLayout() {
             flexDirection: "row",
             alignItems: "flex-start",
             gap: 3,
-            padding: isMobile ? "0 0 40px 0" : "0 0 40px 40px",
+            padding: "0 0 40px 40px",
             overflowX: "auto",
             height: "100%",
             scrollbarWidth: "none",
             msOverflowStyle: "none" as React.CSSProperties["msOverflowStyle"],
-            cursor: isMobile ? "default" : (dragging ? "grabbing" : "grab"),
+            cursor: dragging ? "grabbing" : "grab",
             userSelect: "none",
             WebkitOverflowScrolling: "touch",
           }}>
@@ -1057,13 +1113,15 @@ export default function EPKPage() {
         <StatsSection />
 
         {/* CAMPAIGN */}
-        <section id="campaigns" style={{ ...snap, borderTop: `1px solid ${RULE}`, display: "flex", flexDirection: "column" }}>
-          <div style={{ padding: isMobile ? "24px 24px 24px" : "52px 80px 36px", borderBottom: `1px solid ${RULE}`, flexShrink: 0 }}>
+        <section id="campaigns" style={{ ...(isMobile ? {} : snap), borderTop: `1px solid ${RULE}`, display: "flex", flexDirection: "column" }}>
+          <div style={{ padding: isMobile ? "24px 24px 20px" : "52px 80px 36px", borderBottom: `1px solid ${RULE}`, flexShrink: 0 }}>
             <span style={{ fontFamily: "'Bootzy', serif", fontSize: 36, letterSpacing: 3, color: INK, textTransform: "uppercase" }}>Campaign</span>
-            <div style={{ marginTop: 12, display: "flex", alignItems: "center", gap: 10 }}>
-              <span style={{ fontSize: 9, letterSpacing: 4, color: MUTED, textTransform: "uppercase" }}>Scroll</span>
-              <span style={{ fontSize: 14, color: MUTED }}>→</span>
-            </div>
+            {!isMobile && (
+              <div style={{ marginTop: 12, display: "flex", alignItems: "center", gap: 10 }}>
+                <span style={{ fontSize: 9, letterSpacing: 4, color: MUTED, textTransform: "uppercase" }}>Scroll</span>
+                <span style={{ fontSize: 14, color: MUTED }}>→</span>
+              </div>
+            )}
           </div>
           <CampaignLayout />
         </section>
