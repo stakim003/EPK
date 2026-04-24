@@ -534,11 +534,14 @@ function CampaignLayout() {
   const onMouseUp = () => { dragStart.current = null; setDragging(false); };
 
   if (isMobile) {
+    const MOB_PHOTO_H = "70vh";
+    const MOB_FULL_W = `calc(70vh * 3 / 4)`;
+    const MOB_PAIR_W = `calc(70vh * 3 / 4)`;
     return (
       <div style={{ display: "flex", flexDirection: "column" }}>
-        {/* Video — full width, 75vh tall, tap to play */}
+        {/* Video — full viewport height, full width, tap to play */}
         <div
-          style={{ position: "relative", width: "100%", height: "75vh", backgroundColor: "#0a0a0a", cursor: "pointer", overflow: "hidden" }}
+          style={{ position: "relative", width: "100%", height: `calc(100vh - ${NAV_H}px)`, backgroundColor: "#0a0a0a", cursor: "pointer", overflow: "hidden", flexShrink: 0 }}
           onClick={() => {
             if (!videoRef.current) return;
             if (videoRef.current.paused) { videoRef.current.play(); setPlaying(true); }
@@ -557,33 +560,53 @@ function CampaignLayout() {
             <p style={{ margin: 0, fontFamily: "'Bootzy', serif", fontSize: 22, color: "#fff", lineHeight: 1 }}>{vid.brand}</p>
             <p style={{ margin: 0, fontSize: 9, letterSpacing: 3, color: "rgba(255,255,255,0.6)", textTransform: "uppercase", marginTop: 5 }}>{vid.label} — {vid.year}</p>
           </div>
+          {/* Scroll down hint */}
+          <div style={{ position: "absolute", bottom: 20, right: 20, display: "flex", flexDirection: "column", alignItems: "center", gap: 3 }}>
+            <span style={{ fontSize: 7, letterSpacing: 3, color: "rgba(255,255,255,0.55)", textTransform: "uppercase" }}>Scroll</span>
+            <ChevronDown size={10} color="rgba(255,255,255,0.55)" />
+          </div>
         </div>
 
-        {/* Photos — vertical stack, scroll down to browse */}
-        <div style={{ display: "flex", flexDirection: "column", gap: 3, paddingTop: 3 }}>
-          {slots.map((slot, i) => {
-            if (slot.type === "full") {
+        {/* Photo scroll bar — horizontal, below video */}
+        <div style={{ position: "relative", overflow: "hidden" }}>
+          {/* right fade */}
+          <div style={{ position: "absolute", right: 0, top: 0, bottom: 0, width: 40, background: `linear-gradient(to right, transparent, ${BG})`, zIndex: 2, pointerEvents: "none" }} />
+          <div
+            ref={scrollContainerRef}
+            onScroll={handleScroll}
+            style={{
+              display: "flex", flexDirection: "row", alignItems: "flex-start",
+              gap: 3, padding: "3px 0 0 0",
+              overflowX: "auto", height: MOB_PHOTO_H,
+              scrollbarWidth: "none",
+              msOverflowStyle: "none" as React.CSSProperties["msOverflowStyle"],
+              WebkitOverflowScrolling: "touch",
+            }}
+          >
+            {slots.map((slot, i) => {
+              if (slot.type === "full") {
+                return (
+                  <div key={i} style={{ width: MOB_FULL_W, height: "100%", flexShrink: 0, overflow: "hidden" }}>
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img src={slot.src} alt="" loading="lazy" decoding="async" style={{ width: "100%", height: "100%", objectFit: "cover", objectPosition: SHOOT_POSITIONS[slot.src] ?? "center", display: "block" }} />
+                  </div>
+                );
+              }
+              const pair = slot as { type: "pair"; top: string; bottom: string };
               return (
-                <div key={i} style={{ width: "100%", aspectRatio: "4/5", overflow: "hidden" }}>
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img src={slot.src} alt="" loading="lazy" decoding="async" style={{ width: "100%", height: "100%", objectFit: "cover", objectPosition: SHOOT_POSITIONS[slot.src] ?? "center", display: "block" }} />
+                <div key={i} style={{ width: MOB_PAIR_W, height: "100%", flexShrink: 0, display: "flex", flexDirection: "column", gap: 3 }}>
+                  <div style={{ flex: 1, overflow: "hidden" }}>
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img src={pair.top} alt="" loading="lazy" decoding="async" style={{ width: "100%", height: "100%", objectFit: "cover", objectPosition: SHOOT_POSITIONS[pair.top] ?? "center", display: "block" }} />
+                  </div>
+                  <div style={{ flex: 1, overflow: "hidden" }}>
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img src={pair.bottom} alt="" loading="lazy" decoding="async" style={{ width: "100%", height: "100%", objectFit: "cover", objectPosition: SHOOT_POSITIONS[pair.bottom] ?? "center", display: "block" }} />
+                  </div>
                 </div>
               );
-            }
-            const pair = slot as { type: "pair"; top: string; bottom: string };
-            return (
-              <div key={i} style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 3 }}>
-                <div style={{ aspectRatio: "3/4", overflow: "hidden" }}>
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img src={pair.top} alt="" loading="lazy" decoding="async" style={{ width: "100%", height: "100%", objectFit: "cover", objectPosition: SHOOT_POSITIONS[pair.top] ?? "center", display: "block" }} />
-                </div>
-                <div style={{ aspectRatio: "3/4", overflow: "hidden" }}>
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img src={pair.bottom} alt="" loading="lazy" decoding="async" style={{ width: "100%", height: "100%", objectFit: "cover", objectPosition: SHOOT_POSITIONS[pair.bottom] ?? "center", display: "block" }} />
-                </div>
-              </div>
-            );
-          })}
+            })}
+          </div>
         </div>
       </div>
     );
@@ -1016,36 +1039,37 @@ export default function EPKPage() {
 
         {/* HERO */}
         {isMobile ? (
-          /* Mobile hero: fixed-height image + compact text — everything visible on first load */
-          <section id="hero" style={{ height: `calc(100vh - ${NAV_H}px)`, backgroundColor: BG, display: "flex", flexDirection: "column", overflow: "hidden" }}>
-            {/* Image: exactly enough space, text block gets the rest */}
-            <div style={{ height: "calc(100vh - 52px - 168px)", overflow: "hidden", flexShrink: 0 }}>
+          /* Mobile hero: full-height photo with text overlaid at bottom */
+          <section id="hero" style={{ height: `calc(100vh - ${NAV_H}px)`, position: "relative", overflow: "hidden", backgroundColor: BG }}>
+            {/* Photo fills entire hero */}
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src="/epk-hero.png" alt="Changing Currents" style={{ width: "100%", height: "100%", objectFit: "cover", objectPosition: "top center", display: "block" }} />
+            {/* Text overlay — bottom ~35% of photo, gradient background for legibility */}
+            <div style={{
+              position: "absolute", bottom: 0, left: 0, right: 0,
+              background: "linear-gradient(to bottom, transparent, rgba(245,243,238,0.85) 40%, rgba(245,243,238,0.97) 100%)",
+              padding: "40px 24px 20px",
+              display: "flex", flexDirection: "column", alignItems: "center",
+            }}>
               {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src="/epk-hero.png" alt="Changing Currents" style={{ width: "100%", height: "100%", objectFit: "cover", objectPosition: "top center", display: "block" }} />
-            </div>
-            {/* Bottom text block: exactly 168px */}
-            <div style={{ height: 168, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: "0 24px", gap: 0 }}>
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src="/epk-logo.png" alt="CC Logo" style={{ height: 38, display: "block", mixBlendMode: "multiply", marginBottom: 6 }} />
+              <img src="/epk-logo.png" alt="CC Logo" style={{ height: 36, display: "block", mixBlendMode: "multiply", marginBottom: 6 }} />
               <h1 style={{ fontFamily: "'Bootzy', serif", fontSize: "clamp(34px, 10vw, 52px)", lineHeight: 0.92, color: INK, margin: 0, letterSpacing: "-1px", textAlign: "center" }}>
                 CHANGING<br />CURRENTS
               </h1>
               <p style={{ fontSize: 8, letterSpacing: 5, color: MUTED, textTransform: "uppercase", marginTop: 8, marginBottom: 0, textAlign: "center" }}>
                 DJ &nbsp;/&nbsp; Producer
               </p>
-              <div style={{ display: "flex", alignItems: "center", gap: 10, marginTop: 8 }}>
+              <div style={{ display: "flex", alignItems: "center", gap: 12, marginTop: 8 }}>
                 <p style={{
                   fontFamily: "'Homemade Apple', cursive",
                   fontSize: "clamp(10px, 2.6vw, 13px)",
-                  color: "rgba(0,0,0,0.4)",
-                  margin: 0,
-                  lineHeight: 1,
-                  transform: "rotate(-3deg)",
-                  display: "inline-block",
+                  color: "rgba(0,0,0,0.45)",
+                  margin: 0, lineHeight: 1,
+                  transform: "rotate(-3deg)", display: "inline-block",
                 }}>
                   cc baby!
                 </p>
-                <div style={{ display: "flex", alignItems: "center", gap: 3, opacity: 0.35 }}>
+                <div style={{ display: "flex", alignItems: "center", gap: 3, opacity: 0.4 }}>
                   <span style={{ fontSize: 7, letterSpacing: 3, color: INK, textTransform: "uppercase" }}>Scroll</span>
                   <ChevronDown size={8} color={INK} />
                 </div>
@@ -1158,12 +1182,21 @@ export default function EPKPage() {
                           <Play size={16} color="#fff" style={{ marginLeft: 2 }} />
                         </div>
                       </div>
-                    </div>
-                    {/* Title / label / year below in a row */}
-                    <div style={{ display: "flex", alignItems: "baseline", gap: 16, padding: "14px 24px 16px" }}>
-                      <span style={{ fontFamily: "'Bootzy', serif", fontSize: 20, color: INK, lineHeight: 1.1, flex: 1 }}>{vid.title}</span>
-                      <span style={{ fontSize: 9, letterSpacing: 2, color: MUTED, textTransform: "uppercase", flexShrink: 0 }}>{vid.label}</span>
-                      <span style={{ fontSize: 9, letterSpacing: 2, color: FAINT, textTransform: "uppercase", flexShrink: 0 }}>{vid.year}</span>
+                      {/* Title overlay — bottom of video */}
+                      <div style={{
+                        position: "absolute", bottom: 0, left: 0, right: 0,
+                        background: "linear-gradient(to bottom, transparent, rgba(0,0,0,0.6))",
+                        padding: "32px 20px 18px",
+                        pointerEvents: "none",
+                      }}>
+                        <div style={{ display: "flex", alignItems: "flex-end", justifyContent: "space-between" }}>
+                          <span style={{ fontFamily: "'Bootzy', serif", fontSize: 22, color: "#fff", lineHeight: 1.1 }}>{vid.title}</span>
+                          <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-end", gap: 2 }}>
+                            <span style={{ fontSize: 8, letterSpacing: 2, color: "rgba(255,255,255,0.7)", textTransform: "uppercase" }}>{vid.label}</span>
+                            <span style={{ fontSize: 8, letterSpacing: 2, color: "rgba(255,255,255,0.5)", textTransform: "uppercase" }}>{vid.year}</span>
+                          </div>
+                        </div>
+                      </div>
                     </div>
                   </div>
                 );
